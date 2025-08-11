@@ -120,6 +120,11 @@
             return;
         }
 
+        // ✅ Vibrate for a "double buzz" on shift start
+        if ("vibrate" in navigator) {
+            navigator.vibrate([150, 100, 150]);
+        }
+
         let [hour, minute] = loginValue.split(":").map(Number);
 
         // Force AM
@@ -146,6 +151,12 @@
 
             if (remainingMs <= 0) {
                 clearInterval(interval);
+
+                // ✅ Vibrate longer when shift ends
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([300, 150, 300]);
+                }
+
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
                 document.getElementById("logoutBtn").disabled = false;
@@ -187,6 +198,12 @@
 
             if (remainingMs <= 0) {
                 clearInterval(interval);
+
+                // ✅ Vibrate longer when shift ends (storage restore)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([300, 150, 300]);
+                }
+
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
                 document.getElementById("logoutBtn").disabled = false;
