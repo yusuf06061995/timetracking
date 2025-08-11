@@ -8,106 +8,282 @@
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --success: #43e97b;
+            --danger: #ff416c;
+            --warning: #ffc107;
+            --light: rgba(255, 255, 255, 0.9);
+        }
+        
         body {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background-attachment: fixed;
         }
+        
         .tracker-card {
             background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
-            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-width: 450px;
             width: 100%;
             text-align: center;
-            animation: fadeIn 1s ease;
+            animation: fadeIn 0.8s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .tracker-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+            z-index: -1;
+        }
+        
         .tracker-card h1 {
-            font-size: 26px;
-            margin-bottom: 20px;
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-weight: 500;
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
         .btn-custom {
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .btn-custom::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.2), transparent);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-custom:hover::after {
+            transform: translateY(0);
+        }
+        
         .btn-start {
-            background: linear-gradient(45deg, #43e97b, #38f9d7);
+            background: linear-gradient(45deg, var(--success), #38f9d7);
             color: #000;
         }
+        
         .btn-start:hover {
-            background: linear-gradient(45deg, #38f9d7, #43e97b);
-            transform: scale(1.05);
+            background: linear-gradient(45deg, #38f9d7, var(--success));
+            transform: translateY(-3px);
         }
+        
         .btn-logout {
-            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            background: linear-gradient(45deg, var(--danger), #ff4b2b);
             color: white;
         }
+        
         .btn-logout:hover {
-            background: linear-gradient(45deg, #ff4b2b, #ff416c);
-            transform: scale(1.05);
+            background: linear-gradient(45deg, #ff4b2b, var(--danger));
+            transform: translateY(-3px);
         }
+        
         .countdown {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 15px;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 20px 0;
             background: rgba(0, 0, 0, 0.2);
-            padding: 8px;
+            padding: 12px;
+            border-radius: 10px;
+            letter-spacing: 1px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            font-size: 18px;
+            margin: 15px 0;
+            padding: 10px;
             border-radius: 8px;
+            font-weight: 600;
         }
-        .ok {
-            color: #00ff7f;
-            font-weight: bold;
-            animation: pulse 1s infinite alternate;
+        
+        .waiting {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
         }
+        
+        .on-duty {
+            background: rgba(67, 233, 123, 0.2);
+            color: var(--success);
+        }
+        
+        .completed {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .location-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .location-icon {
+            font-size: 18px;
+            margin-right: 8px;
+            color: var(--success);
+        }
+        
         @keyframes fadeIn {
             from {opacity: 0; transform: translateY(20px);}
             to {opacity: 1; transform: translateY(0);}
         }
+        
         @keyframes pulse {
-            from {transform: scale(1);}
-            to {transform: scale(1.1);}
+            0% {transform: scale(1); opacity: 1;}
+            50% {transform: scale(1.05); opacity: 0.8;}
+            100% {transform: scale(1); opacity: 1;}
+        }
+        
+        @keyframes float {
+            0% {transform: translateY(0px);}
+            50% {transform: translateY(-10px);}
+            100% {transform: translateY(0px);}
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--secondary));
+            border-radius: 10px;
+            transition: width 1s linear;
+        }
+        
+        .time-display {
+            font-size: 18px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .weather-icon {
+            font-size: 24px;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
 
 <div class="tracker-card">
-    <h1><i class="fa-solid fa-clock"></i> Shift Time Tracker</h1>
+    <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
 
-    <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
-    <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
-
-    <div class="d-flex justify-content-center gap-2">
-        <button class="btn btn-custom btn-start" onclick="startShift()">Start Shift</button>
-        <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>Logout</button>
+    <div class="mb-3">
+        <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
+        <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
     </div>
 
-    <div id="outTimeDisplay" class="mt-3">Allowed Logout Time: --</div>
+    <div class="d-flex justify-content-center gap-3 mb-4">
+        <button class="btn btn-custom btn-start" onclick="startShift()">
+            <i class="fas fa-play-circle me-2"></i>Start Shift
+        </button>
+        <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+        </button>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="shiftProgress" style="width: 0%"></div>
+    </div>
+
+    <div class="time-display" id="currentTimeDisplay">Current Time: --</div>
+    <div class="time-display" id="outTimeDisplay">Allowed Logout Time: --</div>
     <div class="countdown" id="countdown">Remaining Time: --</div>
-    <div id="status" class="mt-2">Status: Waiting...</div>
+    
+    <div class="status waiting" id="status">
+        <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
+    </div>
+    
+    <div class="location-info" id="locationInfo">
+        <div><i class="fas fa-map-marker-alt location-icon"></i> <span id="locationText">Getting your location...</span></div>
+        <div><i class="fas fa-temperature-high location-icon"></i> <span id="weatherText">Weather: --</span></div>
+    </div>
 </div>
 
 <!-- Alarm sound -->
 <audio id="alarmSound" preload="auto">
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.mp3" type="audio/mpeg">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
 </audio>
 
 <script>
     const dutyMinutes = 8 * 60 + 45; // 525 minutes
     let interval;
+    let shiftInterval;
+    let locationInterval;
 
     function format12Hour(date) {
         let hours = date.getHours();
@@ -119,6 +295,59 @@
         return `${hours}:${minutes} ${ampm}`;
     }
 
+    function updateCurrentTime() {
+        const now = new Date();
+        document.getElementById('currentTimeDisplay').textContent = `Current Time: ${format12Hour(now)}`;
+    }
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    // Display location
+                    document.getElementById('locationText').textContent = 
+                        `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                    
+                    // Get weather (simplified for demo)
+                    getWeather(latitude, longitude);
+                    
+                    document.getElementById('locationInfo').style.display = 'block';
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    document.getElementById('locationText').textContent = 
+                        "Location: Permission denied or unavailable";
+                    document.getElementById('locationInfo').style.display = 'block';
+                }
+            );
+        } else {
+            document.getElementById('locationText').textContent = 
+                "Geolocation is not supported by this browser";
+            document.getElementById('locationInfo').style.display = 'block';
+        }
+    }
+
+    function getWeather(lat, lon) {
+        // In a real app, you would call a weather API here
+        // For demo purposes, we'll simulate weather based on time of day
+        const hours = new Date().getHours();
+        let weather, icon;
+        
+        if (hours >= 6 && hours < 18) {
+            weather = "Sunny";
+            icon = '<i class="fas fa-sun weather-icon" style="color: #FFD700;"></i>';
+        } else {
+            weather = "Clear";
+            icon = '<i class="fas fa-moon weather-icon" style="color: #ADD8E6;"></i>';
+        }
+        
+        document.getElementById('weatherText').innerHTML = 
+            `Weather: ${weather} ${icon}`;
+    }
+
     function startShift() {
         let loginValue = document.getElementById("loginTime").value;
         if (!loginValue) {
@@ -126,7 +355,7 @@
             return;
         }
 
-        // ✅ Vibrate for a "double buzz" on shift start
+        // Vibrate for feedback
         if ("vibrate" in navigator) {
             navigator.vibrate([150, 100, 150]);
         }
@@ -148,25 +377,45 @@
         let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
 
         document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+        document.getElementById("status").className = "status on-duty";
+        document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Duty...`;
+
+        // Start updating current time
+        updateCurrentTime();
+        shiftInterval = setInterval(updateCurrentTime, 1000);
+
+        // Get user location
+        getLocation();
+        locationInterval = setInterval(getLocation, 300000); // Update every 5 minutes
 
         if (interval) clearInterval(interval);
 
         interval = setInterval(() => {
             let now = new Date();
             let remainingMs = dutyEnd - now;
+            let totalShiftMs = dutyMinutes * 60 * 1000;
+            let elapsedMs = totalShiftMs - remainingMs;
+            
+            // Update progress bar
+            let progressPercent = (elapsedMs / totalShiftMs) * 100;
+            document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
 
             if (remainingMs <= 0) {
                 clearInterval(interval);
+                clearInterval(shiftInterval);
+                clearInterval(locationInterval);
 
-                // ✅ Vibrate longer + play alarm sound
+                // Vibrate and play alarm
                 if ("vibrate" in navigator) {
-                    navigator.vibrate([300, 150, 300]);
+                    navigator.vibrate([300, 150, 300, 150, 300]);
                 }
                 document.getElementById("alarmSound").play();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
-                document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
+                document.getElementById("status").className = "status completed";
+                document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
                 document.getElementById("logoutBtn").disabled = false;
+                document.getElementById("shiftProgress").style.width = "100%";
                 return;
             }
 
@@ -176,45 +425,79 @@
             document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
         }, 1000);
 
-        document.getElementById("status").innerText = "Status: On Duty...";
         document.getElementById("logoutBtn").disabled = true;
     }
 
     function logout() {
-        document.getElementById("status").innerHTML = `<span class="ok">✅ Shift Completed</span>`;
+        clearInterval(interval);
+        clearInterval(shiftInterval);
+        clearInterval(locationInterval);
+        
+        document.getElementById("status").className = "status completed";
+        document.getElementById("status").innerHTML = `<i class="fas fa-flag-checkered me-2"></i>✅ Shift Completed`;
+        document.getElementById("countdown").innerText = "Shift Ended";
+        document.getElementById("shiftProgress").style.width = "0%";
+        
+        // Vibrate for feedback
+        if ("vibrate" in navigator) {
+            navigator.vibrate([100, 50, 100]);
+        }
     }
 
     // Load previous login from storage
     window.onload = function() {
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        
         let savedLogin = localStorage.getItem("loginTime");
         if (savedLogin) {
             let loginDate = new Date(parseInt(savedLogin));
-            startShiftFromStorage(loginDate);
+            let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+            
+            if (new Date() < dutyEnd) {
+                // Shift is still ongoing
+                startShiftFromStorage(loginDate);
+            }
         }
     };
 
     function startShiftFromStorage(loginDate) {
         let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
         document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+        document.getElementById("status").className = "status on-duty";
+        document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Duty...`;
+
+        // Get user location
+        getLocation();
+        locationInterval = setInterval(getLocation, 300000); // Update every 5 minutes
 
         if (interval) clearInterval(interval);
 
         interval = setInterval(() => {
             let now = new Date();
             let remainingMs = dutyEnd - now;
+            let totalShiftMs = dutyMinutes * 60 * 1000;
+            let elapsedMs = totalShiftMs - remainingMs;
+            
+            // Update progress bar
+            let progressPercent = (elapsedMs / totalShiftMs) * 100;
+            document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
 
             if (remainingMs <= 0) {
                 clearInterval(interval);
+                clearInterval(locationInterval);
 
-                // ✅ Vibrate longer + play alarm sound (storage restore)
+                // Vibrate and play alarm
                 if ("vibrate" in navigator) {
-                    navigator.vibrate([300, 150, 300]);
+                    navigator.vibrate([300, 150, 300, 150, 300]);
                 }
                 document.getElementById("alarmSound").play();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
-                document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
+                document.getElementById("status").className = "status completed";
+                document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
                 document.getElementById("logoutBtn").disabled = false;
+                document.getElementById("shiftProgress").style.width = "100%";
                 return;
             }
 
@@ -224,7 +507,6 @@
             document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
         }, 1000);
 
-        document.getElementById("status").innerText = "Status: On Duty...";
         document.getElementById("logoutBtn").disabled = true;
     }
 </script>
