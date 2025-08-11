@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shift Time Tracker</title>
+    <style>
+        /* ===== Background Animation ===== */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== Glass Effect Container ===== */
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
+            display: inline-block;
+            min-width: 320px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* ===== Title ===== */
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
+        }
+
+        /* ===== Input Styling ===== */
+        label {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-align: center;
+        }
+
+        /* ===== Buttons ===== */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(45deg, #43e97b, #38f9d7);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        button:hover {
+            transform: scale(1.07);
+            box-shadow: 0px 0px 15px rgba(72, 239, 173, 0.8);
+        }
+        button:disabled {
+            background: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+        }
+
+        /* ===== Countdown Box ===== */
+        .countdown {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 8px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+        }
+
+        /* ===== Status Text ===== */
+        .ok {
+            color: #00ff9d;
+            font-weight: bold;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* ===== Fade In Animation ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏳ Work Shift Tracker</h1>
+        
+        <label>Enter Login Time:</label><br>
+        <input type="time" id="loginTime">
+        <br>
+        <button onclick="startShift()">Start Shift</button>
+        <button id="logoutBtn" onclick="logout()" disabled>Logout</button>
+        
+        <div id="outTimeDisplay" style="margin-top: 20px; font-size: 18px;">Allowed Logout Time: --</div>
+        <div class="countdown" id="countdown">Remaining Time: --</div>
+        <div id="status" style="margin-top: 10px;">Status: Waiting...</div>
+    </div>
+
+    <script>
+        const dutyMinutes = 8 * 60 + 45; // 525 minutes
+        let interval;
+
+        function format12Hour(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes.toString().padStart(2, '0');
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
+        function startShift() {
+            let loginValue = document.getElementById("loginTime").value;
+            if (!loginValue) {
+                alert("Please enter a login time.");
+                return;
+            }
+
+            let [hour, minute] = loginValue.split(":").map(Number);
+            let loginDate = new Date();
+            loginDate.setHours(hour, minute, 0);
+
+            let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+
+            document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+
+            if (interval) clearInterval(interval);
+
+            interval = setInterval(() => {
+                let now = new Date();
+                let remainingMs = dutyEnd - now;
+
+                if (remainingMs <= 0) {
+                    clearInterval(interval);
+                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m";
+                    document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
+                    document.getElementById("logoutBtn").disabled = false;
+                    return;
+                }
+
+                let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+                let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m`;
+            }, 1000);
+
+            document.getElementById("status").innerText = "Status: On Duty...";
+            document.getElementById("logoutBtn").disabled = true;
+        }
+
+        function logout() {
+            document.getElementById("status").innerHTML = `<span class="ok">✅ Shift Completed</span>`;
+        }
+    </script>
+</body>
+</html>
