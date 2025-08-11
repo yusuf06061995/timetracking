@@ -99,6 +99,12 @@
     <div id="status" class="mt-2">Status: Waiting...</div>
 </div>
 
+<!-- Alarm sound -->
+<audio id="alarmSound" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.mp3" type="audio/mpeg">
+</audio>
+
 <script>
     const dutyMinutes = 8 * 60 + 45; // 525 minutes
     let interval;
@@ -152,10 +158,11 @@
             if (remainingMs <= 0) {
                 clearInterval(interval);
 
-                // ✅ Vibrate longer when shift ends
+                // ✅ Vibrate longer + play alarm sound
                 if ("vibrate" in navigator) {
                     navigator.vibrate([300, 150, 300]);
                 }
+                document.getElementById("alarmSound").play();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
@@ -199,10 +206,11 @@
             if (remainingMs <= 0) {
                 clearInterval(interval);
 
-                // ✅ Vibrate longer when shift ends (storage restore)
+                // ✅ Vibrate longer + play alarm sound (storage restore)
                 if ("vibrate" in navigator) {
                     navigator.vibrate([300, 150, 300]);
                 }
+                document.getElementById("alarmSound").play();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
