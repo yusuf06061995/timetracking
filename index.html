@@ -143,7 +143,7 @@
 
                 if (remainingMs <= 0) {
                     clearInterval(interval);
-                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m";
+                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                     document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
                     document.getElementById("logoutBtn").disabled = false;
                     return;
@@ -151,7 +151,8 @@
 
                 let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
                 let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
-                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m`;
+                let secs = Math.floor((remainingMs / 1000) % 60);
+                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
             }, 1000);
 
             document.getElementById("status").innerText = "Status: On Duty...";
