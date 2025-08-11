@@ -1,179 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Shift Time Tracker</title>
-    <!-- Bootstrap CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
+            font-family: 'Segoe UI', sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(15px);
-            padding: 30px;
+        .tracker-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
+            padding: 30px;
             box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
-            text-align: center;
-            animation: fadeIn 1s ease-in-out;
-            width: 100%;
             max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+        .tracker-card h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
         }
         .btn-custom {
-            background: linear-gradient(45deg, #43e97b, #38f9d7);
-            color: white;
             border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 10px 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-        .btn-custom:hover {
-            transform: scale(1.07);
-            box-shadow: 0px 0px 15px rgba(72, 239, 173, 0.8);
+        .btn-start {
+            background: linear-gradient(45deg, #43e97b, #38f9d7);
+            color: #000;
         }
-        .btn-custom:disabled {
-            background: rgba(255,255,255,0.3);
-            cursor: not-allowed;
+        .btn-start:hover {
+            background: linear-gradient(45deg, #38f9d7, #43e97b);
+            transform: scale(1.05);
+        }
+        .btn-logout {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        .btn-logout:hover {
+            background: linear-gradient(45deg, #ff4b2b, #ff416c);
+            transform: scale(1.05);
         }
         .countdown {
             font-size: 20px;
             font-weight: bold;
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.25);
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
             padding: 8px;
             border-radius: 8px;
-            opacity: 0;
-            animation: fadeIn 1.5s ease forwards;
         }
         .ok {
-            color: #00ff9d;
+            color: #00ff7f;
             font-weight: bold;
             animation: pulse 1s infinite alternate;
         }
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 1; }
-            to { transform: scale(1.1); opacity: 0.8; }
-        }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        @keyframes pulse {
+            from {transform: scale(1);}
+            to {transform: scale(1.1);}
         }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
-        <h1 class="mb-4">⏳ Work Shift Tracker</h1>
+<div class="tracker-card">
+    <h1><i class="fa-solid fa-clock"></i> Shift Time Tracker</h1>
 
-        <div class="mb-3">
-            <label for="loginTime" class="form-label">Enter Login Time:</label>
-            <input type="time" class="form-control text-center" id="loginTime">
-        </div>
+    <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
+    <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
 
-        <div class="d-flex justify-content-center gap-2">
-            <button class="btn btn-custom" onclick="startShift()">Start Shift</button>
-            <button id="logoutBtn" class="btn btn-custom" onclick="logout()" disabled>Logout</button>
-        </div>
-
-        <div id="loginDisplay" class="mt-4 fs-5">Login Time: --</div>
-        <div id="outTimeDisplay" class="mt-2 fs-5">Allowed Logout Time: --</div>
-        <div class="countdown" id="countdown">Remaining Time: --</div>
-        <div id="status" class="mt-3">Status: Waiting...</div>
+    <div class="d-flex justify-content-center gap-2">
+        <button class="btn btn-custom btn-start" onclick="startShift()">Start Shift</button>
+        <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>Logout</button>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div id="outTimeDisplay" class="mt-3">Allowed Logout Time: --</div>
+    <div class="countdown" id="countdown">Remaining Time: --</div>
+    <div id="status" class="mt-2">Status: Waiting...</div>
+</div>
 
-    <script>
-        const dutyMinutes = 8 * 60 + 45; // 525 minutes
-        let interval;
+<script>
+    const dutyMinutes = 8 * 60 + 45; // 525 minutes
+    let interval;
 
-        function format12Hour(date) {
-            let hours = date.getHours();
-            let minutes = date.getMinutes();
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; 
-            minutes = minutes.toString().padStart(2, '0');
-            return `${hours}:${minutes} ${ampm}`;
+    function format12Hour(date) {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes.toString().padStart(2, '0');
+        return `${hours}:${minutes} ${ampm}`;
+    }
+
+    function startShift() {
+        let loginValue = document.getElementById("loginTime").value;
+        if (!loginValue) {
+            alert("Please enter a login time.");
+            return;
         }
 
-        function startShift() {
-            let loginValue = document.getElementById("loginTime").value;
-            if (!loginValue) {
-                alert("Please enter a login time.");
+        let [hour, minute] = loginValue.split(":").map(Number);
+
+        // Force AM
+        if (hour >= 12) {
+            hour -= 12;
+            if (hour === 0) hour = 12;
+        }
+
+        let loginDate = new Date();
+        loginDate.setHours(hour, minute, 0);
+
+        localStorage.setItem("loginTime", loginDate.getTime());
+        sessionStorage.setItem("loginTime", loginDate.getTime());
+
+        let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+
+        document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+
+        if (interval) clearInterval(interval);
+
+        interval = setInterval(() => {
+            let now = new Date();
+            let remainingMs = dutyEnd - now;
+
+            if (remainingMs <= 0) {
+                clearInterval(interval);
+                document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
+                document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
+                document.getElementById("logoutBtn").disabled = false;
                 return;
             }
 
-            let [hour, minute] = loginValue.split(":").map(Number);
-            let loginDate = new Date();
-            loginDate.setHours(hour, minute, 0);
+            let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+            let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+            let secs = Math.floor((remainingMs / 1000) % 60);
+            document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
+        }, 1000);
 
-            // Save login time in LocalStorage & SessionStorage
-            localStorage.setItem("loginTime", loginDate.getTime());
-            sessionStorage.setItem("loginTime", loginDate.getTime());
+        document.getElementById("status").innerText = "Status: On Duty...";
+        document.getElementById("logoutBtn").disabled = true;
+    }
 
-            startCountdown(loginDate);
+    function logout() {
+        document.getElementById("status").innerHTML = `<span class="ok">✅ Shift Completed</span>`;
+    }
+
+    // Load previous login from storage
+    window.onload = function() {
+        let savedLogin = localStorage.getItem("loginTime");
+        if (savedLogin) {
+            let loginDate = new Date(parseInt(savedLogin));
+            startShiftFromStorage(loginDate);
         }
+    };
 
-        function startCountdown(loginDate) {
-            let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+    function startShiftFromStorage(loginDate) {
+        let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+        document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
 
-            document.getElementById("loginDisplay").innerText = `Login Time: ${format12Hour(loginDate)}`;
-            document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+        if (interval) clearInterval(interval);
 
-            if (interval) clearInterval(interval);
+        interval = setInterval(() => {
+            let now = new Date();
+            let remainingMs = dutyEnd - now;
 
-            interval = setInterval(() => {
-                let now = new Date();
-                let remainingMs = dutyEnd - now;
-
-                if (remainingMs <= 0) {
-                    clearInterval(interval);
-                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
-                    document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
-                    document.getElementById("logoutBtn").disabled = false;
-                    return;
-                }
-
-                let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
-                let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
-                let secs = Math.floor((remainingMs / 1000) % 60);
-                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
-            }, 1000);
-
-            document.getElementById("status").innerText = "Status: On Duty...";
-            document.getElementById("logoutBtn").disabled = true;
-        }
-
-        function logout() {
-            document.getElementById("status").innerHTML = `<span class="ok">✅ Shift Completed</span>`;
-            localStorage.removeItem("loginTime");
-            sessionStorage.removeItem("loginTime");
-        }
-
-        // Restore login time if exists
-        window.onload = function () {
-            let storedLogin = localStorage.getItem("loginTime");
-            if (storedLogin) {
-                let loginDate = new Date(parseInt(storedLogin));
-                startCountdown(loginDate);
+            if (remainingMs <= 0) {
+                clearInterval(interval);
+                document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
+                document.getElementById("status").innerHTML = `<span class="ok">✅ You can log out now!</span>`;
+                document.getElementById("logoutBtn").disabled = false;
+                return;
             }
-        };
-    </script>
+
+            let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+            let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+            let secs = Math.floor((remainingMs / 1000) % 60);
+            document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
+        }, 1000);
+
+        document.getElementById("status").innerText = "Status: On Duty...";
+        document.getElementById("logoutBtn").disabled = true;
+    }
+</script>
 
 </body>
 </html>
