@@ -379,22 +379,44 @@
         
         .balloon {
             position: absolute;
-            width: 60px;
-            height: 80px;
+            width: 80px;
+            height: 100px;
             border-radius: 50%;
             animation: balloon-float 8s ease-in-out infinite;
             opacity: 0.8;
             z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            color: #000;
+            text-shadow: 0 0 2px rgba(255,255,255,0.5);
+            box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
         
         .balloon::before {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -15px;
             left: 50%;
             width: 2px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.5);
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.3);
+            transform: translateX(-50%);
+        }
+        
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            width: 8px;
+            height: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
             transform: translateX(-50%);
         }
         
@@ -406,6 +428,14 @@
             right: 10%;
         }
         
+        .balloon-text {
+            position: relative;
+            z-index: 1;
+            padding: 0 5px;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        
         @keyframes balloon-float {
             0%, 100% {
                 transform: translateY(0) rotate(0deg);
@@ -413,6 +443,18 @@
             50% {
                 transform: translateY(-100px) rotate(5deg);
             }
+        }
+        
+        /* Balloon shine effect */
+        .balloon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -425,12 +467,24 @@
 
 <!-- Balloons on both sides -->
 <div class="balloon-container" id="balloonContainer">
-    <div class="balloon left" style="background-color: #FF9933; top: 20%; animation-delay: 0s;"></div>
-    <div class="balloon left" style="background-color: #FFFFFF; top: 40%; animation-delay: 1s;"></div>
-    <div class="balloon left" style="background-color: #138808; top: 60%; animation-delay: 2s;"></div>
-    <div class="balloon right" style="background-color: #FF9933; top: 30%; animation-delay: 0.5s;"></div>
-    <div class="balloon right" style="background-color: #FFFFFF; top: 50%; animation-delay: 1.5s;"></div>
-    <div class="balloon right" style="background-color: #138808; top: 70%; animation-delay: 2.5s;"></div>
+    <div class="balloon left" style="background-color: #FF9933; top: 20%; animation-delay: 0s;">
+        <div class="balloon-text">Happy<br>Independence<br>Day!</div>
+    </div>
+    <div class="balloon left" style="background-color: #FFFFFF; top: 40%; animation-delay: 1s;">
+        <div class="balloon-text">Jai<br>Hind!</div>
+    </div>
+    <div class="balloon left" style="background-color: #138808; top: 60%; animation-delay: 2s;">
+        <div class="balloon-text">Proud<br>to be<br>Indian</div>
+    </div>
+    <div class="balloon right" style="background-color: #FF9933; top: 30%; animation-delay: 0.5s;">
+        <div class="balloon-text">15th<br>August</div>
+    </div>
+    <div class="balloon right" style="background-color: #FFFFFF; top: 50%; animation-delay: 1.5s;">
+        <div class="balloon-text">Vande<br>Mataram</div>
+    </div>
+    <div class="balloon right" style="background-color: #138808; top: 70%; animation-delay: 2.5s;">
+        <div class="balloon-text">Freedom<br>Fighters</div>
+    </div>
 </div>
 
 <div class="tracker-card">
@@ -519,7 +573,8 @@
             const balloons = document.querySelectorAll('.balloon');
             balloons.forEach(balloon => {
                 balloon.style.opacity = '0.9';
-                balloon.style.filter = 'drop-shadow(0 0 5px rgba(0,0,0,0.3))';
+                balloon.style.filter = 'drop-shadow(0 0 8px rgba(0,0,0,0.3))';
+                balloon.style.boxShadow = 'inset -15px -15px 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2)';
             });
         }
     }
