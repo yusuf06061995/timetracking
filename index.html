@@ -17,6 +17,7 @@
             --success: #43e97b;
             --danger: #ff416c;
             --warning: #ffc107;
+            --info: #17a2b8;
             --light: rgba(255, 255, 255, 0.9);
         }
         
@@ -30,6 +31,7 @@
             justify-content: center;
             padding: 20px;
             background-attachment: fixed;
+            overflow-x: hidden;
         }
         
         .tracker-card {
@@ -39,13 +41,14 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            max-width: 450px;
+            max-width: 500px;
             width: 100%;
             text-align: center;
             animation: fadeIn 0.8s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            z-index: 1;
         }
         
         .tracker-card::before {
@@ -168,25 +171,44 @@
             color: var(--success);
         }
         
+        .half-day {
+            background: rgba(23, 162, 184, 0.2);
+            color: var(--info);
+        }
+        
         .completed {
             background: rgba(0, 123, 255, 0.2);
             color: #007bff;
             animation: pulse 1.5s infinite;
         }
         
-        .location-info {
+        .weather-info {
             margin-top: 20px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             font-size: 14px;
-            display: none;
         }
         
-        .location-icon {
+        .weather-icon {
             font-size: 18px;
             margin-right: 8px;
             color: var(--success);
+        }
+        
+        .shift-type {
+            margin-bottom: 15px;
+        }
+        
+        .shift-type .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+        
+        .shift-type .form-check-label {
+            font-weight: 500;
+            cursor: pointer;
         }
         
         @keyframes fadeIn {
@@ -231,23 +253,88 @@
             font-weight: 500;
         }
         
-        .weather-icon {
-            font-size: 24px;
-            margin-left: 5px;
+        /* Patak Theme Elements */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            z-index: 10;
+            animation: confetti-fall 5s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+        
+        .celebration-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255,215,0,0.7);
+            animation: zoomInOut 2s infinite alternate;
+        }
+        
+        @keyframes zoomInOut {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
         }
     </style>
 </head>
 <body>
 
+<!-- Celebration overlay (hidden by default) -->
+<div class="celebration" id="celebration">
+    <div class="celebration-text">Shift Completed! 🎉</div>
+</div>
+
 <div class="tracker-card">
     <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
+
+    <div class="shift-info">
+        <div><i class="fas fa-info-circle me-2"></i> Full Day: 8h 45m | Half Day: 4h 22m</div>
+    </div>
 
     <div class="mb-3">
         <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
         <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
     </div>
 
-    <div class="d-flex justify-content-center gap-3 mb-4">
+    <div class="shift-type mb-3">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="shiftType" id="fullDay" value="full" checked>
+            <label class="form-check-label" for="fullDay">Full Day</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="shiftType" id="halfDay" value="half">
+            <label class="form-check-label" for="halfDay">Half Day</label>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
         <button class="btn btn-custom btn-start" onclick="startShift()">
             <i class="fas fa-play-circle me-2"></i>Start Shift
         </button>
@@ -268,9 +355,8 @@
         <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
     </div>
     
-    <div class="location-info" id="locationInfo">
-        <div><i class="fas fa-map-marker-alt location-icon"></i> <span id="locationText">Getting your location...</span></div>
-        <div><i class="fas fa-temperature-high location-icon"></i> <span id="weatherText">Weather: --</span></div>
+    <div class="weather-info" id="weatherInfo">
+        <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
     </div>
 </div>
 
@@ -279,11 +365,17 @@
     <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
 </audio>
 
+<!-- Celebration sound -->
+<audio id="celebrationSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-    const dutyMinutes = 8 * 60 + 45; // 525 minutes
+    const fullDayMinutes = 8 * 60 + 45; // 525 minutes (8h 45m)
+    const halfDayMinutes = 4 * 60 + 22; // 262 minutes (4h 22m)
     let interval;
     let shiftInterval;
-    let locationInterval;
+    let weatherInterval;
 
     function format12Hour(date) {
         let hours = date.getHours();
@@ -300,37 +392,7 @@
         document.getElementById('currentTimeDisplay').textContent = `Current Time: ${format12Hour(now)}`;
     }
 
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    
-                    // Display location
-                    document.getElementById('locationText').textContent = 
-                        `Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-                    
-                    // Get weather (simplified for demo)
-                    getWeather(latitude, longitude);
-                    
-                    document.getElementById('locationInfo').style.display = 'block';
-                },
-                (error) => {
-                    console.error("Error getting location:", error);
-                    document.getElementById('locationText').textContent = 
-                        "Location: Permission denied or unavailable";
-                    document.getElementById('locationInfo').style.display = 'block';
-                }
-            );
-        } else {
-            document.getElementById('locationText').textContent = 
-                "Geolocation is not supported by this browser";
-            document.getElementById('locationInfo').style.display = 'block';
-        }
-    }
-
-    function getWeather(lat, lon) {
+    function getWeather() {
         // In a real app, you would call a weather API here
         // For demo purposes, we'll simulate weather based on time of day
         const hours = new Date().getHours();
@@ -348,12 +410,45 @@
             `Weather: ${weather} ${icon}`;
     }
 
+    function createConfetti() {
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+        const celebration = document.getElementById('celebration');
+        
+        // Clear any existing confetti
+        celebration.innerHTML = '<div class="celebration-text">Shift Completed! 🎉</div>';
+        
+        // Create 100 confetti pieces
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = Math.random() * 10 + 5 + 'px';
+            confetti.style.height = Math.random() * 10 + 5 + 'px';
+            confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            celebration.appendChild(confetti);
+        }
+        
+        // Show celebration
+        celebration.style.display = 'block';
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            celebration.style.display = 'none';
+        }, 5000);
+    }
+
     function startShift() {
         let loginValue = document.getElementById("loginTime").value;
         if (!loginValue) {
             alert("Please enter a login time.");
             return;
         }
+
+        // Get selected shift type
+        const shiftType = document.querySelector('input[name="shiftType"]:checked').value;
+        const shiftMinutes = shiftType === 'half' ? halfDayMinutes : fullDayMinutes;
 
         // Vibrate for feedback
         if ("vibrate" in navigator) {
@@ -372,28 +467,36 @@
         loginDate.setHours(hour, minute, 0);
 
         localStorage.setItem("loginTime", loginDate.getTime());
+        localStorage.setItem("shiftType", shiftType);
         sessionStorage.setItem("loginTime", loginDate.getTime());
+        sessionStorage.setItem("shiftType", shiftType);
 
-        let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+        let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
 
-        document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
-        document.getElementById("status").className = "status on-duty";
-        document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Duty...`;
+        document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+        
+        if (shiftType === 'full') {
+            document.getElementById("status").className = "status on-duty";
+            document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
+        } else {
+            document.getElementById("status").className = "status half-day";
+            document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
+        }
 
         // Start updating current time
         updateCurrentTime();
         shiftInterval = setInterval(updateCurrentTime, 1000);
 
-        // Get user location
-        getLocation();
-        locationInterval = setInterval(getLocation, 300000); // Update every 5 minutes
+        // Get weather and update periodically
+        getWeather();
+        weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
 
         if (interval) clearInterval(interval);
 
         interval = setInterval(() => {
             let now = new Date();
             let remainingMs = dutyEnd - now;
-            let totalShiftMs = dutyMinutes * 60 * 1000;
+            let totalShiftMs = shiftMinutes * 60 * 1000;
             let elapsedMs = totalShiftMs - remainingMs;
             
             // Update progress bar
@@ -403,13 +506,12 @@
             if (remainingMs <= 0) {
                 clearInterval(interval);
                 clearInterval(shiftInterval);
-                clearInterval(locationInterval);
+                clearInterval(weatherInterval);
 
-                // Vibrate and play alarm
-                if ("vibrate" in navigator) {
-                    navigator.vibrate([300, 150, 300, 150, 300]);
-                }
+                // Play alarm and celebration
                 document.getElementById("alarmSound").play();
+                document.getElementById("celebrationSound").play();
+                createConfetti();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").className = "status completed";
@@ -431,7 +533,7 @@
     function logout() {
         clearInterval(interval);
         clearInterval(shiftInterval);
-        clearInterval(locationInterval);
+        clearInterval(weatherInterval);
         
         document.getElementById("status").className = "status completed";
         document.getElementById("status").innerHTML = `<i class="fas fa-flag-checkered me-2"></i>✅ Shift Completed`;
@@ -448,35 +550,48 @@
     window.onload = function() {
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
+        getWeather();
         
         let savedLogin = localStorage.getItem("loginTime");
+        let savedShiftType = localStorage.getItem("shiftType") || 'full';
+        
         if (savedLogin) {
             let loginDate = new Date(parseInt(savedLogin));
-            let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
+            let shiftMinutes = savedShiftType === 'half' ? halfDayMinutes : fullDayMinutes;
+            let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
+            
+            // Set the radio button to match saved shift type
+            document.getElementById(savedShiftType === 'half' ? 'halfDay' : 'fullDay').checked = true;
             
             if (new Date() < dutyEnd) {
                 // Shift is still ongoing
-                startShiftFromStorage(loginDate);
+                startShiftFromStorage(loginDate, shiftMinutes, savedShiftType);
             }
         }
     };
 
-    function startShiftFromStorage(loginDate) {
-        let dutyEnd = new Date(loginDate.getTime() + dutyMinutes * 60 * 1000);
-        document.getElementById("outTimeDisplay").innerText = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
-        document.getElementById("status").className = "status on-duty";
-        document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Duty...`;
+    function startShiftFromStorage(loginDate, shiftMinutes, shiftType) {
+        let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
+        document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+        
+        if (shiftType === 'full') {
+            document.getElementById("status").className = "status on-duty";
+            document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
+        } else {
+            document.getElementById("status").className = "status half-day";
+            document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
+        }
 
-        // Get user location
-        getLocation();
-        locationInterval = setInterval(getLocation, 300000); // Update every 5 minutes
+        // Get weather and update periodically
+        getWeather();
+        weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
 
         if (interval) clearInterval(interval);
 
         interval = setInterval(() => {
             let now = new Date();
             let remainingMs = dutyEnd - now;
-            let totalShiftMs = dutyMinutes * 60 * 1000;
+            let totalShiftMs = shiftMinutes * 60 * 1000;
             let elapsedMs = totalShiftMs - remainingMs;
             
             // Update progress bar
@@ -485,13 +600,12 @@
 
             if (remainingMs <= 0) {
                 clearInterval(interval);
-                clearInterval(locationInterval);
+                clearInterval(weatherInterval);
 
-                // Vibrate and play alarm
-                if ("vibrate" in navigator) {
-                    navigator.vibrate([300, 150, 300, 150, 300]);
-                }
+                // Play alarm and celebration
                 document.getElementById("alarmSound").play();
+                document.getElementById("celebrationSound").play();
+                createConfetti();
 
                 document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
                 document.getElementById("status").className = "status completed";
