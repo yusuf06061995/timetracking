@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* Default colors */
         :root {
             --primary: #6a11cb;
             --secondary: #2575fc;
@@ -19,6 +20,10 @@
             --warning: #ffc107;
             --info: #17a2b8;
             --light: rgba(255, 255, 255, 0.9);
+            --saffron: #FF9933;
+            --white: #FFFFFF;
+            --green: #138808;
+            --navy-blue: #000080;
         }
         
         body {
@@ -32,6 +37,18 @@
             padding: 20px;
             background-attachment: fixed;
             overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+        
+        /* Indian Flag Theme - Only applied on Aug 13-15 */
+        body.independence-day {
+            background: linear-gradient(
+                to bottom,
+                var(--saffron) 33%,
+                var(--white) 33% 66%,
+                var(--green) 66%
+            );
+            color: #333;
         }
         
         .tracker-card {
@@ -49,6 +66,12 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+        }
+        
+        .independence-day .tracker-card {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .tracker-card::before {
@@ -74,6 +97,10 @@
             gap: 10px;
         }
         
+        .independence-day .tracker-card h1 {
+            color: #000;
+        }
+        
         .form-control {
             background: rgba(255, 255, 255, 0.2);
             border: none;
@@ -83,10 +110,22 @@
             font-weight: 500;
         }
         
+        .independence-day .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
         .form-control:focus {
             background: rgba(255, 255, 255, 0.3);
             color: white;
             box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15);
+        }
+        
+        .independence-day .form-control:focus {
+            background: rgba(255, 255, 255, 1);
+            color: #000;
+            box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
         }
         
         .form-control::placeholder {
@@ -153,6 +192,11 @@
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
         }
         
+        .independence-day .countdown {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
+        }
+        
         .status {
             font-size: 18px;
             margin: 15px 0;
@@ -182,12 +226,21 @@
             animation: pulse 1.5s infinite;
         }
         
+        .independence-day .status {
+            color: #000;
+        }
+        
         .weather-info {
             margin-top: 20px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             font-size: 14px;
+        }
+        
+        .independence-day .weather-info {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
         }
         
         .weather-icon {
@@ -253,6 +306,10 @@
             font-weight: 500;
         }
         
+        .independence-day .time-display {
+            color: #000;
+        }
+        
         /* Patak Theme Elements */
         .confetti {
             position: absolute;
@@ -302,6 +359,61 @@
             0% { transform: translate(-50%, -50%) scale(1); }
             100% { transform: translate(-50%, -50%) scale(1.2); }
         }
+        
+        /* Ashoka Chakra Animation */
+        @keyframes rotateChakra {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Balloon styles */
+        .balloon-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            border-radius: 50%;
+            animation: balloon-float 8s ease-in-out infinite;
+            opacity: 0.8;
+            z-index: 0;
+        }
+        
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            width: 2px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: translateX(-50%);
+        }
+        
+        .balloon.left {
+            left: 10%;
+        }
+        
+        .balloon.right {
+            right: 10%;
+        }
+        
+        @keyframes balloon-float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-100px) rotate(5deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -309,6 +421,16 @@
 <!-- Celebration overlay (hidden by default) -->
 <div class="celebration" id="celebration">
     <div class="celebration-text">Shift Completed! 🎉</div>
+</div>
+
+<!-- Balloons on both sides -->
+<div class="balloon-container" id="balloonContainer">
+    <div class="balloon left" style="background-color: #FF9933; top: 20%; animation-delay: 0s;"></div>
+    <div class="balloon left" style="background-color: #FFFFFF; top: 40%; animation-delay: 1s;"></div>
+    <div class="balloon left" style="background-color: #138808; top: 60%; animation-delay: 2s;"></div>
+    <div class="balloon right" style="background-color: #FF9933; top: 30%; animation-delay: 0.5s;"></div>
+    <div class="balloon right" style="background-color: #FFFFFF; top: 50%; animation-delay: 1.5s;"></div>
+    <div class="balloon right" style="background-color: #138808; top: 70%; animation-delay: 2.5s;"></div>
 </div>
 
 <div class="tracker-card">
@@ -376,6 +498,31 @@
     let interval;
     let shiftInterval;
     let weatherInterval;
+
+    // Check if current date is Aug 13, 14, or 15
+    function isIndependencePeriod() {
+        const today = new Date();
+        const month = today.getMonth() + 1; // Months are 0-indexed
+        const date = today.getDate();
+        
+        return month === 8 && (date === 13 || date === 14 || date === 15);
+    }
+
+    // Apply theme if in independence period
+    function applyTheme() {
+        if (isIndependencePeriod()) {
+            document.body.classList.add('independence-day');
+            // Change clock icon color to be visible on white background
+            document.querySelector('.fa-clock').style.color = '#000';
+            
+            // Make balloons more visible during independence day
+            const balloons = document.querySelectorAll('.balloon');
+            balloons.forEach(balloon => {
+                balloon.style.opacity = '0.9';
+                balloon.style.filter = 'drop-shadow(0 0 5px rgba(0,0,0,0.3))';
+            });
+        }
+    }
 
     function format12Hour(date) {
         let hours = date.getHours();
@@ -548,6 +695,7 @@
 
     // Load previous login from storage
     window.onload = function() {
+        applyTheme(); // Apply theme first
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
         getWeather();
