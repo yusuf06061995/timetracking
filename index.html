@@ -1,832 +1,851 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Shift Time Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Shift Time Tracker</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <!-- Bootstrap & Icons -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* Default colors */
-        :root {
-            --primary: #6a11cb;
-            --secondary: #2575fc;
-            --success: #43e97b;
-            --danger: #ff416c;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --light: rgba(255, 255, 255, 0.9);
-            --saffron: #FF9933;
-            --white: #FFFFFF;
-            --green: #138808;
-            --navy-blue: #000080;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            transition: background 0.5s ease;
-        }
-        
-        /* Indian Flag Theme - Only applied on Aug 13-15 */
-        body.independence-day {
-            background: linear-gradient(
-                to bottom,
-                var(--saffron) 33%,
-                var(--white) 33% 66%,
-                var(--green) 66%
-            );
-            color: #333;
-        }
-        
-        .tracker-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            animation: fadeIn 0.8s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        .independence-day .tracker-card {
-            background: rgba(255, 255, 255, 0.8);
-            color: #333;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .tracker-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            transform: rotate(30deg);
-            z-index: -1;
-        }
-        
-        .tracker-card h1 {
-            font-size: 28px;
-            margin-bottom: 25px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .independence-day .tracker-card h1 {
-            color: #000;
-        }
-        
-        .form-control {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            border-radius: 10px;
-            padding: 12px 15px;
-            font-weight: 500;
-        }
-        
-        .independence-day .form-control {
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15);
-        }
-        
-        .independence-day .form-control:focus {
-            background: rgba(255, 255, 255, 1);
-            color: #000;
-            box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .btn-custom {
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            padding: 12px 25px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-custom::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(255,255,255,0.2), transparent);
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .btn-custom:hover::after {
-            transform: translateY(0);
-        }
-        
-        .btn-start {
-            background: linear-gradient(45deg, var(--success), #38f9d7);
-            color: #000;
-        }
-        
-        .btn-start:hover {
-            background: linear-gradient(45deg, #38f9d7, var(--success));
-            transform: translateY(-3px);
-        }
-        
-        .btn-logout {
-            background: linear-gradient(45deg, var(--danger), #ff4b2b);
-            color: white;
-        }
-        
-        .btn-logout:hover {
-            background: linear-gradient(45deg, #ff4b2b, var(--danger));
-            transform: translateY(-3px);
-        }
-        
-        .countdown {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 20px 0;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 12px;
-            border-radius: 10px;
-            letter-spacing: 1px;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .independence-day .countdown {
-            background: rgba(0, 0, 0, 0.1);
-            color: #000;
-        }
-        
-        .status {
-            font-size: 18px;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        
-        .waiting {
-            background: rgba(255, 193, 7, 0.2);
-            color: var(--warning);
-        }
-        
-        .on-duty {
-            background: rgba(67, 233, 123, 0.2);
-            color: var(--success);
-        }
-        
-        .half-day {
-            background: rgba(23, 162, 184, 0.2);
-            color: var(--info);
-        }
-        
-        .completed {
-            background: rgba(0, 123, 255, 0.2);
-            color: #007bff;
-            animation: pulse 1.5s infinite;
-        }
-        
-        .independence-day .status {
-            color: #000;
-        }
-        
-        .weather-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            font-size: 14px;
-        }
-        
-        .independence-day .weather-info {
-            background: rgba(0, 0, 0, 0.1);
-            color: #000;
-        }
-        
-        .weather-icon {
-            font-size: 18px;
-            margin-right: 8px;
-            color: var(--success);
-        }
-        
-        .shift-type {
-            margin-bottom: 15px;
-        }
-        
-        .shift-type .form-check-input {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-        }
-        
-        .shift-type .form-check-label {
-            font-weight: 500;
-            cursor: pointer;
-        }
-        
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(20px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        
-        @keyframes pulse {
-            0% {transform: scale(1); opacity: 1;}
-            50% {transform: scale(1.05); opacity: 0.8;}
-            100% {transform: scale(1); opacity: 1;}
-        }
-        
-        @keyframes float {
-            0% {transform: translateY(0px);}
-            50% {transform: translateY(-10px);}
-            100% {transform: translateY(0px);}
-        }
-        
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .progress-container {
-            margin: 20px 0;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success), var(--secondary));
-            border-radius: 10px;
-            transition: width 1s linear;
-        }
-        
-        .time-display {
-            font-size: 18px;
-            margin: 10px 0;
-            font-weight: 500;
-        }
-        
-        .independence-day .time-display {
-            color: #000;
-        }
-        
-        /* Patak Theme Elements */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            opacity: 0;
-            z-index: 10;
-            animation: confetti-fall 5s linear forwards;
-        }
-        
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(-100px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-        
-        .celebration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-            display: none;
-        }
-        
-        .celebration-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
-            font-weight: bold;
-            color: gold;
-            text-shadow: 0 0 10px rgba(255,215,0,0.7);
-            animation: zoomInOut 2s infinite alternate;
-        }
-        
-        @keyframes zoomInOut {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            100% { transform: translate(-50%, -50%) scale(1.2); }
-        }
-        
-        /* Ashoka Chakra Animation */
-        @keyframes rotateChakra {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
+        <style>
 
-        /* Balloon styles */
-        .balloon-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
+            
+
+
+    /* Very small screens */
+    @media (max-width: 576px) {
         .balloon {
-            position: absolute;
-            width: 80px;
-            height: 100px;
-            border-radius: 50%;
-            animation: balloon-float 8s ease-in-out infinite;
-            opacity: 0.8;
-            z-index: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            text-align: center;
-            color: #000;
-            text-shadow: 0 0 2px rgba(255,255,255,0.5);
-            box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            width: 40px;
+            height: 55px;
+            font-size: 6px;
         }
         
-        .balloon::before {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            width: 2px;
-            height: 60px;
-            background-color: rgba(0, 0, 0, 0.3);
-            transform: translateX(-50%);
-        }
-        
-        .balloon::after {
-            content: '';
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            width: 8px;
-            height: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            transform: translateX(-50%);
-        }
-        
+        /* Adjust positions to float above card content */
         .balloon.left {
-            left: 10%;
+            left: 3% !important;
         }
-        
         .balloon.right {
-            right: 10%;
+            right: 3% !important;
         }
         
-        .balloon-text {
-            position: relative;
-            z-index: 1;
-            padding: 0 5px;
-            word-break: break-word;
-            line-height: 1.2;
+        /* More compact vertical spacing */
+        .balloon:nth-child(1).left {
+            top: 5% !important;
         }
-        
-        @keyframes balloon-float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
+        .balloon:nth-child(2).left {
+            top: 20% !important;
+        }
+        .balloon:nth-child(3).left {
+            top: 35% !important;
+        }
+        .balloon:nth-child(4).right {
+            top: 10% !important;
+        }
+        .balloon:nth-child(5).right {
+            top: 25% !important;
+        }
+        .balloon:nth-child(6).right {
+            top: 40% !important;
+        }
+    }
+            /* Default colors */
+            :root {
+                --primary: #6a11cb;
+                --secondary: #2575fc;
+                --success: #43e97b;
+                --danger: #ff416c;
+                --warning: #ffc107;
+                --info: #17a2b8;
+                --light: rgba(255, 255, 255, 0.9);
+                --saffron: #FF9933;
+                --white: #FFFFFF;
+                --green: #138808;
+                --navy-blue: #000080;
             }
-            50% {
-                transform: translateY(-100px) rotate(5deg);
+            
+            body {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                color: white;
+                font-family: 'Poppins', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                background-attachment: fixed;
+                overflow-x: hidden;
+                transition: background 0.5s ease;
+            }
+            
+            /* Indian Flag Theme - Only applied on Aug 13-15 */
+            body.independence-day {
+                background: linear-gradient(
+                    to bottom,
+                    var(--saffron) 33%,
+                    var(--white) 33% 66%,
+                    var(--green) 66%
+                );
+                color: #333;
+            }
+            
+            .tracker-card {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                max-width: 500px;
+                width: 100%;
+                text-align: center;
+                animation: fadeIn 0.8s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                position: relative;
+                overflow: hidden;
+                z-index: 1;
+            }
+            
+            .independence-day .tracker-card {
+                background: rgba(255, 255, 255, 0.8);
+                color: #333;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .tracker-card::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                transform: rotate(30deg);
+                z-index: -1;
+            }
+            
+            .tracker-card h1 {
+                font-size: 28px;
+                margin-bottom: 25px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .independence-day .tracker-card h1 {
+                color: #000;
+            }
+            
+            .form-control {
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                border-radius: 10px;
+                padding: 12px 15px;
+                font-weight: 500;
+            }
+            
+            .independence-day .form-control {
+                background: rgba(255, 255, 255, 0.9);
+                color: #333;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15);
+            }
+            
+            .independence-day .form-control:focus {
+                background: rgba(255, 255, 255, 1);
+                color: #000;
+                box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+            }
+            
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+            
+            .btn-custom {
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                padding: 12px 25px;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .btn-custom::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(rgba(255,255,255,0.2), transparent);
+                transform: translateY(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .btn-custom:hover::after {
+                transform: translateY(0);
+            }
+            
+            .btn-start {
+                background: linear-gradient(45deg, var(--success), #38f9d7);
+                color: #000;
+            }
+            
+            .btn-start:hover {
+                background: linear-gradient(45deg, #38f9d7, var(--success));
+                transform: translateY(-3px);
+            }
+            
+            .btn-logout {
+                background: linear-gradient(45deg, var(--danger), #ff4b2b);
+                color: white;
+            }
+            
+            .btn-logout:hover {
+                background: linear-gradient(45deg, #ff4b2b, var(--danger));
+                transform: translateY(-3px);
+            }
+            
+            .countdown {
+                font-size: 22px;
+                font-weight: 700;
+                margin: 20px 0;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 12px;
+                border-radius: 10px;
+                letter-spacing: 1px;
+                box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+            }
+            
+            .independence-day .countdown {
+                background: rgba(0, 0, 0, 0.1);
+                color: #000;
+            }
+            
+            .status {
+                font-size: 18px;
+                margin: 15px 0;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: 600;
+            }
+            
+            .waiting {
+                background: rgba(255, 193, 7, 0.2);
+                color: var(--warning);
+            }
+            
+            .on-duty {
+                background: rgba(67, 233, 123, 0.2);
+                color: var(--success);
+            }
+            
+            .half-day {
+                background: rgba(23, 162, 184, 0.2);
+                color: var(--info);
+            }
+            
+            .completed {
+                background: rgba(0, 123, 255, 0.2);
+                color: #007bff;
+                animation: pulse 1.5s infinite;
+            }
+            
+            .independence-day .status {
+                color: #000;
+            }
+            
+            .weather-info {
+                margin-top: 20px;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.15);
+                border-radius: 10px;
+                font-size: 14px;
+            }
+            
+            .independence-day .weather-info {
+                background: rgba(0, 0, 0, 0.1);
+                color: #000;
+            }
+            
+            .weather-icon {
+                font-size: 18px;
+                margin-right: 8px;
+                color: var(--success);
+            }
+            
+            .shift-type {
+                margin-bottom: 15px;
+            }
+            
+            .shift-type .form-check-input {
+                width: 20px;
+                height: 20px;
+                margin-right: 8px;
+            }
+            
+            .shift-type .form-check-label {
+                font-weight: 500;
+                cursor: pointer;
+            }
+            
+            @keyframes fadeIn {
+                from {opacity: 0; transform: translateY(20px);}
+                to {opacity: 1; transform: translateY(0);}
+            }
+            
+            @keyframes pulse {
+                0% {transform: scale(1); opacity: 1;}
+                50% {transform: scale(1.05); opacity: 0.8;}
+                100% {transform: scale(1); opacity: 1;}
+            }
+            
+            @keyframes float {
+                0% {transform: translateY(0px);}
+                50% {transform: translateY(-10px);}
+                100% {transform: translateY(0px);}
+            }
+            
+            .floating {
+                animation: float 3s ease-in-out infinite;
+            }
+            
+            .progress-container {
+                margin: 20px 0;
+                height: 8px;
+                background: rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            
+            .progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, var(--success), var(--secondary));
+                border-radius: 10px;
+                transition: width 1s linear;
+            }
+            
+            .time-display {
+                font-size: 18px;
+                margin: 10px 0;
+                font-weight: 500;
+            }
+            
+            .independence-day .time-display {
+                color: #000;
+            }
+            
+            /* Patak Theme Elements */
+            .confetti {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background-color: #f00;
+                opacity: 0;
+                z-index: 10;
+                animation: confetti-fall 5s linear forwards;
+            }
+            
+            @keyframes confetti-fall {
+                0% {
+                    transform: translateY(-100px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+            
+            .celebration {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 100;
+                display: none;
+            }
+            
+            .celebration-text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 3rem;
+                font-weight: bold;
+                color: gold;
+                text-shadow: 0 0 10px rgba(255,215,0,0.7);
+                animation: zoomInOut 2s infinite alternate;
+            }
+            
+            @keyframes zoomInOut {
+                0% { transform: translate(-50%, -50%) scale(1); }
+                100% { transform: translate(-50%, -50%) scale(1.2); }
+            }
+            
+            /* Ashoka Chakra Animation */
+            @keyframes rotateChakra {
+                from { transform: translate(-50%, -50%) rotate(0deg); }
+                to { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+
+            /* Balloon styles */
+            .balloon-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+            }
+            
+            .balloon {
+                position: absolute;
+                width: 80px;
+                height: 100px;
+                border-radius: 50%;
+                animation: balloon-float 8s ease-in-out infinite;
+                opacity: 0.8;
+                z-index: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                font-weight: bold;
+                text-align: center;
+                color: #000;
+                text-shadow: 0 0 2px rgba(255,255,255,0.5);
+                box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+            
+            .balloon::before {
+                content: '';
+                position: absolute;
+                bottom: -15px;
+                left: 50%;
+                width: 2px;
+                height: 60px;
+                background-color: rgba(0, 0, 0, 0.3);
+                transform: translateX(-50%);
+            }
+            
+            .balloon::after {
+                content: '';
+                position: absolute;
+                bottom: -25px;
+                left: 50%;
+                width: 8px;
+                height: 10px;
+                background-color: rgba(0, 0, 0, 0.3);
+                border-radius: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .balloon.left {
+                left: 10%;
+            }
+            
+            .balloon.right {
+                right: 10%;
+            }
+            
+            .balloon-text {
+                position: relative;
+                z-index: 1;
+                padding: 0 5px;
+                word-break: break-word;
+                line-height: 1.2;
+            }
+            
+            @keyframes balloon-float {
+                0%, 100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+                50% {
+                    transform: translateY(-100px) rotate(5deg);
+                }
+            }
+            
+            /* Balloon shine effect */
+            .balloon::after {
+                content: '';
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 20px;
+                height: 20px;
+                background: rgba(255,255,255,0.3);
+                border-radius: 50%;
+            }
+        </style>
+    </head>
+    <body>
+
+    <!-- Celebration overlay (hidden by default) -->
+    <div class="celebration" id="celebration">
+        <div class="celebration-text">Shift Completed! 🎉</div>
+    </div>
+
+
+    <div class="tracker-card">
+        <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
+
+        <div class="shift-info">
+            <div><i class="fas fa-info-circle me-2"></i> Full Day: 8h 45m | Half Day: 4h 22m</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
+            <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
+        </div>
+
+        <div class="shift-type mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="shiftType" id="fullDay" value="full" checked>
+                <label class="form-check-label" for="fullDay">Full Day</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="shiftType" id="halfDay" value="half">
+                <label class="form-check-label" for="halfDay">Half Day</label>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+            <button class="btn btn-custom btn-start" onclick="startShift()">
+                <i class="fas fa-play-circle me-2"></i>Start Shift
+            </button>
+            <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="shiftProgress" style="width: 0%"></div>
+        </div>
+
+        <div class="time-display" id="currentTimeDisplay">Current Time: --</div>
+        <div class="time-display" id="outTimeDisplay">Allowed Logout Time: --</div>
+        <div class="countdown" id="countdown">Remaining Time: --</div>
+        
+        <div class="status waiting" id="status">
+            <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
+        </div>
+        
+        <div class="weather-info" id="weatherInfo">
+            <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
+        </div>
+    </div>
+
+    <!-- Alarm sound -->
+    <audio id="alarmSound" preload="auto">
+        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Celebration sound -->
+    <audio id="celebrationSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const fullDayMinutes = 8 * 60 + 45; // 525 minutes (8h 45m)
+        const halfDayMinutes = 4 * 60 + 22; // 262 minutes (4h 22m)
+        let interval;
+        let shiftInterval;
+        let weatherInterval;
+
+        // Check if current date is Aug 13, 14, or 15
+        function isIndependencePeriod() {
+            const today = new Date();
+            const month = today.getMonth() + 1; // Months are 0-indexed
+            const date = today.getDate();
+            
+            return month === 8 && (date === 13 || date === 14 || date === 15);
+        }
+
+        // Apply theme if in independence period
+        function applyTheme() {
+            if (isIndependencePeriod()) {
+                document.body.classList.add('independence-day');
+                // Change clock icon color to be visible on white background
+                document.querySelector('.fa-clock').style.color = '#000';
+                
+                // Make balloons more visible during independence day
+                const balloons = document.querySelectorAll('.balloon');
+                balloons.forEach(balloon => {
+                    balloon.style.opacity = '0.9';
+                    balloon.style.filter = 'drop-shadow(0 0 8px rgba(0,0,0,0.3))';
+                    balloon.style.boxShadow = 'inset -15px -15px 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2)';
+                });
             }
         }
-        
-        /* Balloon shine effect */
-        .balloon::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 20px;
-            height: 20px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
+
+        function format12Hour(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes.toString().padStart(2, '0');
+            return `${hours}:${minutes} ${ampm}`;
         }
-    </style>
-</head>
-<body>
 
-<!-- Celebration overlay (hidden by default) -->
-<div class="celebration" id="celebration">
-    <div class="celebration-text">Shift Completed! 🎉</div>
-</div>
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTimeDisplay').textContent = `Current Time: ${format12Hour(now)}`;
+        }
 
-<!-- Balloons on both sides -->
-<div class="balloon-container" id="balloonContainer">
-    <div class="balloon left" style="background-color: #FF9933; top: 20%; animation-delay: 0s;">
-        <div class="balloon-text">Happy<br>Independence<br>Day!</div>
-    </div>
-    <div class="balloon left" style="background-color: #FFFFFF; top: 40%; animation-delay: 1s;">
-        <div class="balloon-text">Jai<br>Hind!</div>
-    </div>
-    <div class="balloon left" style="background-color: #138808; top: 60%; animation-delay: 2s;">
-        <div class="balloon-text">Proud<br>to be<br>Indian</div>
-    </div>
-    <div class="balloon right" style="background-color: #FF9933; top: 30%; animation-delay: 0.5s;">
-        <div class="balloon-text">15th<br>August</div>
-    </div>
-    <div class="balloon right" style="background-color: #FFFFFF; top: 50%; animation-delay: 1.5s;">
-        <div class="balloon-text">Vande<br>Mataram</div>
-    </div>
-    <div class="balloon right" style="background-color: #138808; top: 70%; animation-delay: 2.5s;">
-        <div class="balloon-text">Freedom<br>Fighters</div>
-    </div>
-</div>
-
-<div class="tracker-card">
-    <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
-
-    <div class="shift-info">
-        <div><i class="fas fa-info-circle me-2"></i> Full Day: 8h 45m | Half Day: 4h 22m</div>
-    </div>
-
-    <div class="mb-3">
-        <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
-        <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
-    </div>
-
-    <div class="shift-type mb-3">
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="shiftType" id="fullDay" value="full" checked>
-            <label class="form-check-label" for="fullDay">Full Day</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="shiftType" id="halfDay" value="half">
-            <label class="form-check-label" for="halfDay">Half Day</label>
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-        <button class="btn btn-custom btn-start" onclick="startShift()">
-            <i class="fas fa-play-circle me-2"></i>Start Shift
-        </button>
-        <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>
-            <i class="fas fa-sign-out-alt me-2"></i>Logout
-        </button>
-    </div>
-
-    <div class="progress-container">
-        <div class="progress-bar" id="shiftProgress" style="width: 0%"></div>
-    </div>
-
-    <div class="time-display" id="currentTimeDisplay">Current Time: --</div>
-    <div class="time-display" id="outTimeDisplay">Allowed Logout Time: --</div>
-    <div class="countdown" id="countdown">Remaining Time: --</div>
-    
-    <div class="status waiting" id="status">
-        <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
-    </div>
-    
-    <div class="weather-info" id="weatherInfo">
-        <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
-    </div>
-</div>
-
-<!-- Alarm sound -->
-<audio id="alarmSound" preload="auto">
-    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
-
-<!-- Celebration sound -->
-<audio id="celebrationSound" preload="auto">
-    <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-    const fullDayMinutes = 8 * 60 + 45; // 525 minutes (8h 45m)
-    const halfDayMinutes = 4 * 60 + 22; // 262 minutes (4h 22m)
-    let interval;
-    let shiftInterval;
-    let weatherInterval;
-
-    // Check if current date is Aug 13, 14, or 15
-    function isIndependencePeriod() {
-        const today = new Date();
-        const month = today.getMonth() + 1; // Months are 0-indexed
-        const date = today.getDate();
-        
-        return month === 8 && (date === 13 || date === 14 || date === 15);
-    }
-
-    // Apply theme if in independence period
-    function applyTheme() {
-        if (isIndependencePeriod()) {
-            document.body.classList.add('independence-day');
-            // Change clock icon color to be visible on white background
-            document.querySelector('.fa-clock').style.color = '#000';
+        function getWeather() {
+            // In a real app, you would call a weather API here
+            // For demo purposes, we'll simulate weather based on time of day
+            const hours = new Date().getHours();
+            let weather, icon;
             
-            // Make balloons more visible during independence day
-            const balloons = document.querySelectorAll('.balloon');
-            balloons.forEach(balloon => {
-                balloon.style.opacity = '0.9';
-                balloon.style.filter = 'drop-shadow(0 0 8px rgba(0,0,0,0.3))';
-                balloon.style.boxShadow = 'inset -15px -15px 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2)';
-            });
-        }
-    }
-
-    function format12Hour(date) {
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        minutes = minutes.toString().padStart(2, '0');
-        return `${hours}:${minutes} ${ampm}`;
-    }
-
-    function updateCurrentTime() {
-        const now = new Date();
-        document.getElementById('currentTimeDisplay').textContent = `Current Time: ${format12Hour(now)}`;
-    }
-
-    function getWeather() {
-        // In a real app, you would call a weather API here
-        // For demo purposes, we'll simulate weather based on time of day
-        const hours = new Date().getHours();
-        let weather, icon;
-        
-        if (hours >= 6 && hours < 18) {
-            weather = "Sunny";
-            icon = '<i class="fas fa-sun weather-icon" style="color: #FFD700;"></i>';
-        } else {
-            weather = "Clear";
-            icon = '<i class="fas fa-moon weather-icon" style="color: #ADD8E6;"></i>';
-        }
-        
-        document.getElementById('weatherText').innerHTML = 
-            `Weather: ${weather} ${icon}`;
-    }
-
-    function createConfetti() {
-        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
-        const celebration = document.getElementById('celebration');
-        
-        // Clear any existing confetti
-        celebration.innerHTML = '<div class="celebration-text">Shift Completed! 🎉</div>';
-        
-        // Create 100 confetti pieces
-        for (let i = 0; i < 100; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.width = Math.random() * 10 + 5 + 'px';
-            confetti.style.height = Math.random() * 10 + 5 + 'px';
-            confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
-            confetti.style.animationDelay = Math.random() * 2 + 's';
-            celebration.appendChild(confetti);
-        }
-        
-        // Show celebration
-        celebration.style.display = 'block';
-        
-        // Hide after 5 seconds
-        setTimeout(() => {
-            celebration.style.display = 'none';
-        }, 5000);
-    }
-
-    function startShift() {
-        let loginValue = document.getElementById("loginTime").value;
-        if (!loginValue) {
-            alert("Please enter a login time.");
-            return;
-        }
-
-        // Get selected shift type
-        const shiftType = document.querySelector('input[name="shiftType"]:checked').value;
-        const shiftMinutes = shiftType === 'half' ? halfDayMinutes : fullDayMinutes;
-
-        // Vibrate for feedback
-        if ("vibrate" in navigator) {
-            navigator.vibrate([150, 100, 150]);
-        }
-
-        let [hour, minute] = loginValue.split(":").map(Number);
-
-        // Force AM
-        if (hour >= 12) {
-            hour -= 12;
-            if (hour === 0) hour = 12;
-        }
-
-        let loginDate = new Date();
-        loginDate.setHours(hour, minute, 0);
-
-        localStorage.setItem("loginTime", loginDate.getTime());
-        localStorage.setItem("shiftType", shiftType);
-        sessionStorage.setItem("loginTime", loginDate.getTime());
-        sessionStorage.setItem("shiftType", shiftType);
-
-        let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
-
-        document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
-        
-        if (shiftType === 'full') {
-            document.getElementById("status").className = "status on-duty";
-            document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
-        } else {
-            document.getElementById("status").className = "status half-day";
-            document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
-        }
-
-        // Start updating current time
-        updateCurrentTime();
-        shiftInterval = setInterval(updateCurrentTime, 1000);
-
-        // Get weather and update periodically
-        getWeather();
-        weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
-
-        if (interval) clearInterval(interval);
-
-        interval = setInterval(() => {
-            let now = new Date();
-            let remainingMs = dutyEnd - now;
-            let totalShiftMs = shiftMinutes * 60 * 1000;
-            let elapsedMs = totalShiftMs - remainingMs;
+            if (hours >= 6 && hours < 18) {
+                weather = "Sunny";
+                icon = '<i class="fas fa-sun weather-icon" style="color: #FFD700;"></i>';
+            } else {
+                weather = "Clear";
+                icon = '<i class="fas fa-moon weather-icon" style="color: #ADD8E6;"></i>';
+            }
             
-            // Update progress bar
-            let progressPercent = (elapsedMs / totalShiftMs) * 100;
-            document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
+            document.getElementById('weatherText').innerHTML = 
+                `Weather: ${weather} ${icon}`;
+        }
 
-            if (remainingMs <= 0) {
-                clearInterval(interval);
-                clearInterval(shiftInterval);
-                clearInterval(weatherInterval);
+        function createConfetti() {
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+            const celebration = document.getElementById('celebration');
+            
+            // Clear any existing confetti
+            celebration.innerHTML = '<div class="celebration-text">Shift Completed! 🎉</div>';
+            
+            // Create 100 confetti pieces
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                celebration.appendChild(confetti);
+            }
+            
+            // Show celebration
+            celebration.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                celebration.style.display = 'none';
+            }, 5000);
+        }
 
-                // Play alarm and celebration
-                document.getElementById("alarmSound").play();
-                document.getElementById("celebrationSound").play();
-                createConfetti();
-
-                document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
-                document.getElementById("status").className = "status completed";
-                document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
-                document.getElementById("logoutBtn").disabled = false;
-                document.getElementById("shiftProgress").style.width = "100%";
+        function startShift() {
+            let loginValue = document.getElementById("loginTime").value;
+            if (!loginValue) {
+                alert("Please enter a login time.");
                 return;
             }
 
-            let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
-            let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
-            let secs = Math.floor((remainingMs / 1000) % 60);
-            document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
-        }, 1000);
+            // Get selected shift type
+            const shiftType = document.querySelector('input[name="shiftType"]:checked').value;
+            const shiftMinutes = shiftType === 'half' ? halfDayMinutes : fullDayMinutes;
 
-        document.getElementById("logoutBtn").disabled = true;
-    }
+            // Vibrate for feedback
+            if ("vibrate" in navigator) {
+                navigator.vibrate([150, 100, 150]);
+            }
 
-    function logout() {
-        clearInterval(interval);
-        clearInterval(shiftInterval);
-        clearInterval(weatherInterval);
-        
-        document.getElementById("status").className = "status completed";
-        document.getElementById("status").innerHTML = `<i class="fas fa-flag-checkered me-2"></i>✅ Shift Completed`;
-        document.getElementById("countdown").innerText = "Shift Ended";
-        document.getElementById("shiftProgress").style.width = "0%";
-        
-        // Vibrate for feedback
-        if ("vibrate" in navigator) {
-            navigator.vibrate([100, 50, 100]);
-        }
-    }
+            let [hour, minute] = loginValue.split(":").map(Number);
 
-    // Load previous login from storage
-    window.onload = function() {
-        applyTheme(); // Apply theme first
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 1000);
-        getWeather();
-        
-        let savedLogin = localStorage.getItem("loginTime");
-        let savedShiftType = localStorage.getItem("shiftType") || 'full';
-        
-        if (savedLogin) {
-            let loginDate = new Date(parseInt(savedLogin));
-            let shiftMinutes = savedShiftType === 'half' ? halfDayMinutes : fullDayMinutes;
+            // Force AM
+            if (hour >= 12) {
+                hour -= 12;
+                if (hour === 0) hour = 12;
+            }
+
+            let loginDate = new Date();
+            loginDate.setHours(hour, minute, 0);
+
+            localStorage.setItem("loginTime", loginDate.getTime());
+            localStorage.setItem("shiftType", shiftType);
+            sessionStorage.setItem("loginTime", loginDate.getTime());
+            sessionStorage.setItem("shiftType", shiftType);
+
             let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
+
+            document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
             
-            // Set the radio button to match saved shift type
-            document.getElementById(savedShiftType === 'half' ? 'halfDay' : 'fullDay').checked = true;
-            
-            if (new Date() < dutyEnd) {
-                // Shift is still ongoing
-                startShiftFromStorage(loginDate, shiftMinutes, savedShiftType);
-            }
-        }
-    };
-
-    function startShiftFromStorage(loginDate, shiftMinutes, shiftType) {
-        let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
-        document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
-        
-        if (shiftType === 'full') {
-            document.getElementById("status").className = "status on-duty";
-            document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
-        } else {
-            document.getElementById("status").className = "status half-day";
-            document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
-        }
-
-        // Get weather and update periodically
-        getWeather();
-        weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
-
-        if (interval) clearInterval(interval);
-
-        interval = setInterval(() => {
-            let now = new Date();
-            let remainingMs = dutyEnd - now;
-            let totalShiftMs = shiftMinutes * 60 * 1000;
-            let elapsedMs = totalShiftMs - remainingMs;
-            
-            // Update progress bar
-            let progressPercent = (elapsedMs / totalShiftMs) * 100;
-            document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
-
-            if (remainingMs <= 0) {
-                clearInterval(interval);
-                clearInterval(weatherInterval);
-
-                // Play alarm and celebration
-                document.getElementById("alarmSound").play();
-                document.getElementById("celebrationSound").play();
-                createConfetti();
-
-                document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
-                document.getElementById("status").className = "status completed";
-                document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
-                document.getElementById("logoutBtn").disabled = false;
-                document.getElementById("shiftProgress").style.width = "100%";
-                return;
+            if (shiftType === 'full') {
+                document.getElementById("status").className = "status on-duty";
+                document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
+            } else {
+                document.getElementById("status").className = "status half-day";
+                document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
             }
 
-            let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
-            let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
-            let secs = Math.floor((remainingMs / 1000) % 60);
-            document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
-        }, 1000);
+            // Start updating current time
+            updateCurrentTime();
+            shiftInterval = setInterval(updateCurrentTime, 1000);
 
-        document.getElementById("logoutBtn").disabled = true;
-    }
-</script>
+            // Get weather and update periodically
+            getWeather();
+            weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
 
-</body>
-</html>
+            if (interval) clearInterval(interval);
+
+            interval = setInterval(() => {
+                let now = new Date();
+                let remainingMs = dutyEnd - now;
+                let totalShiftMs = shiftMinutes * 60 * 1000;
+                let elapsedMs = totalShiftMs - remainingMs;
+                
+                // Update progress bar
+                let progressPercent = (elapsedMs / totalShiftMs) * 100;
+                document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
+
+                if (remainingMs <= 0) {
+                    clearInterval(interval);
+                    clearInterval(shiftInterval);
+                    clearInterval(weatherInterval);
+
+                    // Play alarm and celebration
+                    document.getElementById("alarmSound").play();
+                    document.getElementById("celebrationSound").play();
+                    createConfetti();
+
+                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
+                    document.getElementById("status").className = "status completed";
+                    document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
+                    document.getElementById("logoutBtn").disabled = false;
+                    document.getElementById("shiftProgress").style.width = "100%";
+                    return;
+                }
+
+                let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+                let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+                let secs = Math.floor((remainingMs / 1000) % 60);
+                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
+            }, 1000);
+
+            document.getElementById("logoutBtn").disabled = true;
+        }
+
+        function logout() {
+            clearInterval(interval);
+            clearInterval(shiftInterval);
+            clearInterval(weatherInterval);
+            
+            document.getElementById("status").className = "status completed";
+            document.getElementById("status").innerHTML = `<i class="fas fa-flag-checkered me-2"></i>✅ Shift Completed`;
+            document.getElementById("countdown").innerText = "Shift Ended";
+            document.getElementById("shiftProgress").style.width = "0%";
+            
+            // Vibrate for feedback
+            if ("vibrate" in navigator) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+
+        // Load previous login from storage
+        window.onload = function() {
+            applyTheme(); // Apply theme first
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            getWeather();
+            
+            let savedLogin = localStorage.getItem("loginTime");
+            let savedShiftType = localStorage.getItem("shiftType") || 'full';
+            
+            if (savedLogin) {
+                let loginDate = new Date(parseInt(savedLogin));
+                let shiftMinutes = savedShiftType === 'half' ? halfDayMinutes : fullDayMinutes;
+                let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
+                
+                // Set the radio button to match saved shift type
+                document.getElementById(savedShiftType === 'half' ? 'halfDay' : 'fullDay').checked = true;
+                
+                if (new Date() < dutyEnd) {
+                    // Shift is still ongoing
+                    startShiftFromStorage(loginDate, shiftMinutes, savedShiftType);
+                }
+            }
+        };
+
+        function startShiftFromStorage(loginDate, shiftMinutes, shiftType) {
+            let dutyEnd = new Date(loginDate.getTime() + shiftMinutes * 60 * 1000);
+            document.getElementById("outTimeDisplay").textContent = `Allowed Logout Time: ${format12Hour(dutyEnd)}`;
+            
+            if (shiftType === 'full') {
+                document.getElementById("status").className = "status on-duty";
+                document.getElementById("status").innerHTML = `<i class="fas fa-running me-2"></i>Status: On Full Day Duty...`;
+            } else {
+                document.getElementById("status").className = "status half-day";
+                document.getElementById("status").innerHTML = `<i class="fas fa-clock-half me-2"></i>Status: On Half Day Duty...`;
+            }
+
+            // Get weather and update periodically
+            getWeather();
+            weatherInterval = setInterval(getWeather, 300000); // Update every 5 minutes
+
+            if (interval) clearInterval(interval);
+
+            interval = setInterval(() => {
+                let now = new Date();
+                let remainingMs = dutyEnd - now;
+                let totalShiftMs = shiftMinutes * 60 * 1000;
+                let elapsedMs = totalShiftMs - remainingMs;
+                
+                // Update progress bar
+                let progressPercent = (elapsedMs / totalShiftMs) * 100;
+                document.getElementById("shiftProgress").style.width = `${Math.min(progressPercent, 100)}%`;
+
+                if (remainingMs <= 0) {
+                    clearInterval(interval);
+                    clearInterval(weatherInterval);
+
+                    // Play alarm and celebration
+                    document.getElementById("alarmSound").play();
+                    document.getElementById("celebrationSound").play();
+                    createConfetti();
+
+                    document.getElementById("countdown").innerText = "Remaining Time: 0h 0m 0s";
+                    document.getElementById("status").className = "status completed";
+                    document.getElementById("status").innerHTML = `<i class="fas fa-check-circle me-2"></i>✅ You can log out now!`;
+                    document.getElementById("logoutBtn").disabled = false;
+                    document.getElementById("shiftProgress").style.width = "100%";
+                    return;
+                }
+
+                let hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+                let mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+                let secs = Math.floor((remainingMs / 1000) % 60);
+                document.getElementById("countdown").innerText = `Remaining Time: ${hrs}h ${mins}m ${secs}s`;
+            }, 1000);
+
+            document.getElementById("logoutBtn").disabled = true;
+        }
+    </script>
+
+    </body>
+    </html>
