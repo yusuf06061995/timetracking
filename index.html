@@ -388,7 +388,7 @@
     </div>
 
 
-    <div class="tracker-card">
+    <div class="tracker-card card">
         <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
 
         <div class="shift-info">
@@ -435,9 +435,10 @@
         <div class="weather-info" id="weatherInfo">
             <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
         </div>
-        <a type="#" class="text-white mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-         To install The app on your andriod 
-    </a>
+       <a id="installLink" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    To install the app on your Android
+  </a>
+
 
     </div>
 
@@ -453,29 +454,22 @@
 
 
   <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+     <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        
+      <div class="modal-content text-dark">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Install App</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">Install App</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-
         <div class="modal-body">
-          <p>You can add this app to your home screen for a better experience.</p>
-          <p><b>Steps:</b></p>
-          <ul>
-            <li>Tap on <b>Share</b> or <b>Menu</b> in your browser.</li>
-            <li>Select <b>Add to Home Screen</b>.</li>
-          </ul>
+          Click below to install the Time Tracking App.
         </div>
-
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
- <button type="button" class="btn btn-success" id="gotItBtn">Install App</button>        </div>
-
+          <button type="button" id="installBtn" class="btn btn-success">Install</button>
+        </div>
       </div>
+    </div>
+  </div>
 
     <script>
   if ("serviceWorker" in navigator) {
@@ -529,30 +523,37 @@
 </body>
 </html>
 
+ <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+    const installLink = document.getElementById("installLink");
 
-<script>
-let deferredPrompt; // Will store the event
+    // Detect if app is already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) {
+      installLink.style.display = "none"; // Hide install link
+    }
 
-// Listen for install prompt event
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault(); // Prevent auto prompt
-  deferredPrompt = e; // Save the event for later use
-  console.log("Install prompt saved");
-});
+    // Listen for beforeinstallprompt
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installLink.style.display = "block"; // Show only when installable
+    });
 
-// Handle click on "Got it" button
-document.getElementById("gotItBtn").addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt(); // Show install prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
-    deferredPrompt = null; // Clear after use
-  } else {
-    alert("Install option not available yet. Try refreshing.");
-  }
-});
-</script>
-
+    // Handle install button click
+    installBtn.addEventListener("click", async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          console.log("App installed");
+          installLink.style.display = "none"; // Hide after install
+        }
+        deferredPrompt = null;
+      }
+    });
+  </script>
 
 
 
