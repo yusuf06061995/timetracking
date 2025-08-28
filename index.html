@@ -1,445 +1,354 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Shift Time Tracker</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!-- Bootstrap & Icons -->
-        <link rel="manifest" href="manifest.json">
-        <meta name="theme-color" content="#000000">
-        <link rel="icon" href="icons/icon-192.png">
-        <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-        <link rel="icon" type="image/png" href="timer-icon.svg">  
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-        <style>
-      /* Default colors */
-            :root {
-                --primary: #6a11cb;
-                --secondary: #2575fc;
-                --success: #43e97b;
-                --danger: #ff416c;
-                --warning: #ffc107;
-                --info: #17a2b8;
-                --light: rgba(255, 255, 255, 0.9);
-                --saffron: #FF9933;
-                --white: #FFFFFF;
-                --green: #138808;
-                --navy-blue: #000080;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shift Time Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --success: #43e97b;
+            --danger: #ff416c;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: rgba(255, 255, 255, 0.9);
+            --saffron: #FF9933;
+            --white: #FFFFFF;
+            --green: #138808;
+            --navy-blue: #000080;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+        
+        /* Indian Flag Theme - Only applied on Aug 13-15 */
+        body.independence-day {
+            background: linear-gradient(
+                to bottom,
+                var(--saffron) 33%,
+                var(--white) 33% 66%,
+                var(--green) 66%
+            );
+            color: #333;
+        }
+        
+        .tracker-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .independence-day .tracker-card {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-custom {
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            padding: 12px 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(45deg, var(--success), #38f9d7);
+            color: #000;
+        }
+        
+        .btn-start:hover {
+            background: linear-gradient(45deg, #38f9d7, var(--success));
+            transform: translateY(-3px);
+        }
+        
+        .btn-logout {
+            background: linear-gradient(45deg, var(--danger), #ff4b2b);
+            color: white;
+        }
+        
+        .btn-logout:hover {
+            background: linear-gradient(45deg, #ff4b2b, var(--danger));
+            transform: translateY(-3px);
+        }
+        
+        .countdown {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            letter-spacing: 1px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .independence-day .countdown {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
+        }
+        
+        .status {
+            font-size: 18px;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .waiting {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+        
+        .on-duty {
+            background: rgba(67, 233, 123, 0.2);
+            color: var(--success);
+        }
+        
+        .half-day {
+            background: rgba(23, 162, 184, 0.2);
+            color: var(--info);
+        }
+        
+        .completed {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .independence-day .status {
+            color: #000;
+        }
+        
+        .weather-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .independence-day .weather-info {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
+        }
+        
+        .weather-icon {
+            font-size: 18px;
+            margin-right: 8px;
+            color: var(--success);
+        }
+        
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        @keyframes pulse {
+            0% {transform: scale(1); opacity: 1;}
+            50% {transform: scale(1.05); opacity: 0.8;}
+            100% {transform: scale(1); opacity: 1;}
+        }
+        
+        @keyframes float {
+            0% {transform: translateY(0px);}
+            50% {transform: translateY(-10px);}
+            100% {transform: translateY(0px);}
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--secondary));
+            border-radius: 10px;
+            transition: width 1s linear;
+        }
+        
+        .time-display {
+            font-size: 18px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .independence-day .time-display {
+            color: #000;
+        }
+        
+        /* Patak Theme Elements */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            z-index: 10;
+            animation: confetti-fall 5s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
             }
-            
-            body {
-                background: linear-gradient(135deg, var(--primary), var(--secondary));
-                color: white;
-                font-family: 'Poppins', sans-serif;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-                background-attachment: fixed;
-                overflow-x: hidden;
-                transition: background 0.5s ease;
-            }
-            
-            /* Indian Flag Theme - Only applied on Aug 13-15 */
-            body.independence-day {
-                background: linear-gradient(
-                    to bottom,
-                    var(--saffron) 33%,
-                    var(--white) 33% 66%,
-                    var(--green) 66%
-                );
-                color: #333;
-            }
-            
-            .tracker-card {
-                background: rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-radius: 20px;
-                padding: 30px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-                max-width: 500px;
-                width: 100%;
-                text-align: center;
-                animation: fadeIn 0.8s ease;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                position: relative;
-                overflow: hidden;
-                z-index: 1;
-            }
-            
-            .independence-day .tracker-card {
-                background: rgba(255, 255, 255, 0.8);
-                color: #333;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            
-            .tracker-card::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-                transform: rotate(30deg);
-                z-index: -1;
-            }
-            
-            .tracker-card h1 {
-                font-size: 28px;
-                margin-bottom: 25px;
-                font-weight: 700;
-                letter-spacing: 0.5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-            }
-            
-            .independence-day .tracker-card h1 {
-                color: #000;
-            }
-            
-            .form-control {
-                background: rgba(255, 255, 255, 0.2);
-                border: none;
-                color: white;
-                border-radius: 10px;
-                padding: 12px 15px;
-                font-weight: 500;
-            }
-            
-            .independence-day .form-control {
-                background: rgba(255, 255, 255, 0.9);
-                color: #333;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            
-            .form-control:focus {
-                background: rgba(255, 255, 255, 0.3);
-                color: white;
-                box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.15);
-            }
-            
-            .independence-day .form-control:focus {
-                background: rgba(255, 255, 255, 1);
-                color: #000;
-                box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
-            }
-            
-            .form-control::placeholder {
-                color: rgba(255, 255, 255, 0.7);
-            }
-            
-            .btn-custom {
-                border: none;
-                border-radius: 10px;
-                font-size: 16px;
-                padding: 12px 25px;
-                transition: all 0.3s ease;
-                font-weight: 600;
-                letter-spacing: 0.5px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .btn-custom::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(rgba(255,255,255,0.2), transparent);
-                transform: translateY(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .btn-custom:hover::after {
-                transform: translateY(0);
-            }
-            
-            .btn-start {
-                background: linear-gradient(45deg, var(--success), #38f9d7);
-                color: #000;
-            }
-            
-            .btn-start:hover {
-                background: linear-gradient(45deg, #38f9d7, var(--success));
-                transform: translateY(-3px);
-            }
-            
-            .btn-logout {
-                background: linear-gradient(45deg, var(--danger), #ff4b2b);
-                color: white;
-            }
-            
-            .btn-logout:hover {
-                background: linear-gradient(45deg, #ff4b2b, var(--danger));
-                transform: translateY(-3px);
-            }
-            
-            .countdown {
-                font-size: 22px;
-                font-weight: 700;
-                margin: 20px 0;
-                background: rgba(0, 0, 0, 0.2);
-                padding: 12px;
-                border-radius: 10px;
-                letter-spacing: 1px;
-                box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
-            }
-            
-            .independence-day .countdown {
-                background: rgba(0, 0, 0, 0.1);
-                color: #000;
-            }
-            
-            .status {
-                font-size: 18px;
-                margin: 15px 0;
-                padding: 10px;
-                border-radius: 8px;
-                font-weight: 600;
-            }
-            
-            .waiting {
-                background: rgba(255, 193, 7, 0.2);
-                color: var(--warning);
-            }
-            
-            .on-duty {
-                background: rgba(67, 233, 123, 0.2);
-                color: var(--success);
-            }
-            
-            .half-day {
-                background: rgba(23, 162, 184, 0.2);
-                color: var(--info);
-            }
-            
-            .completed {
-                background: rgba(0, 123, 255, 0.2);
-                color: #007bff;
-                animation: pulse 1.5s infinite;
-            }
-            
-            .independence-day .status {
-                color: #000;
-            }
-            
-            .weather-info {
-                margin-top: 20px;
-                padding: 15px;
-                background: rgba(0, 0, 0, 0.15);
-                border-radius: 10px;
-                font-size: 14px;
-            }
-            
-            .independence-day .weather-info {
-                background: rgba(0, 0, 0, 0.1);
-                color: #000;
-            }
-            
-            .weather-icon {
-                font-size: 18px;
-                margin-right: 8px;
-                color: var(--success);
-            }
-            
-            .shift-type {
-                margin-bottom: 15px;
-            }
-            
-            .shift-type .form-check-input {
-                width: 20px;
-                height: 20px;
-                margin-right: 8px;
-            }
-            
-            .shift-type .form-check-label {
-                font-weight: 500;
-                cursor: pointer;
-            }
-            
-            @keyframes fadeIn {
-                from {opacity: 0; transform: translateY(20px);}
-                to {opacity: 1; transform: translateY(0);}
-            }
-            
-            @keyframes pulse {
-                0% {transform: scale(1); opacity: 1;}
-                50% {transform: scale(1.05); opacity: 0.8;}
-                100% {transform: scale(1); opacity: 1;}
-            }
-            
-            @keyframes float {
-                0% {transform: translateY(0px);}
-                50% {transform: translateY(-10px);}
-                100% {transform: translateY(0px);}
-            }
-            
-            .floating {
-                animation: float 3s ease-in-out infinite;
-            }
-            
-            .progress-container {
-                margin: 20px 0;
-                height: 8px;
-                background: rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-                overflow: hidden;
-            }
-            
-            .progress-bar {
-                height: 100%;
-                background: linear-gradient(90deg, var(--success), var(--secondary));
-                border-radius: 10px;
-                transition: width 1s linear;
-            }
-            
-            .time-display {
-                font-size: 18px;
-                margin: 10px 0;
-                font-weight: 500;
-            }
-            
-            .independence-day .time-display {
-                color: #000;
-            }
-            
-            /* Patak Theme Elements */
-            .confetti {
-                position: absolute;
-                width: 10px;
-                height: 10px;
-                background-color: #f00;
+            100% {
+                transform: translateY(100vh) rotate(360deg);
                 opacity: 0;
-                z-index: 10;
-                animation: confetti-fall 5s linear forwards;
             }
-            
-            @keyframes confetti-fall {
-                0% {
-                    transform: translateY(-100px) rotate(0deg);
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-            
-            .celebration {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 100;
-                display: none;
-            }
-            
-            .celebration-text {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 3rem;
-                font-weight: bold;
-                color: gold;
-                text-shadow: 0 0 10px rgba(255,215,0,0.7);
-                animation: zoomInOut 2s infinite alternate;
-            }
-            
-            @keyframes zoomInOut {
-                0% { transform: translate(-50%, -50%) scale(1); }
-                100% { transform: translate(-50%, -50%) scale(1.2); }
-            }
-            
-            /* Ashoka Chakra Animation */
-            @keyframes rotateChakra {
-                from { transform: translate(-50%, -50%) rotate(0deg); }
-                to { transform: translate(-50%, -50%) rotate(360deg); }
-            }
-
-           
-        </style>
-
-    </head>
-    <body>
-
-    
-    
-
-    
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+        
+        .celebration-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255,215,0,0.7);
+            animation: zoomInOut 2s infinite alternate;
+        }
+        
+        @keyframes zoomInOut {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+    </style>
+</head>
+<body>
     <!-- Celebration overlay (hidden by default) -->
     <div class="celebration" id="celebration">
         <div class="celebration-text">Shift Completed! 🎉</div>
     </div>
 
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="tracker-card">
+                    <h1 class="mb-4"><i class="fas fa-clock floating me-2" style="color: #fff;"></i> Shift Time Tracker</h1>
 
-    <div class="tracker-card card">
-        <h1><i class="fas fa-clock floating" style="color: #fff;"></i> Shift Time Tracker</h1>
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i> Full Day: 8h 45m | Half Day: 4h 22m
+                    </div>
 
-        <div class="shift-info">
-            <div><i class="fas fa-info-circle me-2"></i> Full Day: 8h 45m | Half Day: 4h 22m</div>
-        </div>
+                    <div class="mb-4">
+                        <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
+                        <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
+                    </div>
 
-        <div class="mb-3">
-            <label for="loginTime" class="form-label fw-bold">Enter Login Time:</label>
-            <input type="time" class="form-control text-center mb-3" id="loginTime" value="09:00">
-        </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">Shift Type:</label>
+                        <div class="d-flex justify-content-center gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="shiftType" id="fullDay" value="full" checked>
+                                <label class="form-check-label" for="fullDay">Full Day</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="shiftType" id="halfDay" value="half">
+                                <label class="form-check-label" for="halfDay">Half Day</label>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="shift-type mb-3">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="shiftType" id="fullDay" value="full" checked>
-                <label class="form-check-label" for="fullDay">Full Day</label>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+                        <button class="btn btn-custom btn-start me-md-2" onclick="startShift()">
+                            <i class="fas fa-play-circle me-2"></i>Start Shift
+                        </button>
+                        <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="shiftProgress" style="width: 0%"></div>
+                    </div>
+
+                    <div class="card bg-transparent mb-2">
+                        <div class="card-body p-2">
+                            <div class="time-display" id="currentTimeDisplay">Current Time: --</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-transparent mb-2">
+                        <div class="card-body p-2">
+                            <div class="time-display" id="outTimeDisplay">Allowed Logout Time: --</div>
+                        </div>
+                    </div>
+                    
+                    <div class="countdown mb-3" id="countdown">Remaining Time: --</div>
+                    
+                    <div class="status waiting mb-3" id="status">
+                        <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
+                    </div>
+                    
+                    <div class="weather-info card bg-transparent">
+                        <div class="card-body p-2">
+                            <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#installModal">
+                            <i class="fas fa-download me-2"></i>Install App
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="shiftType" id="halfDay" value="half">
-                <label class="form-check-label" for="halfDay">Half Day</label>
-            </div>
         </div>
-
-        <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-            <button class="btn btn-custom btn-start" onclick="startShift()">
-                <i class="fas fa-play-circle me-2"></i>Start Shift
-            </button>
-            <button class="btn btn-custom btn-logout" id="logoutBtn" onclick="logout()" disabled>
-                <i class="fas fa-sign-out-alt me-2"></i>Logout
-            </button>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar" id="shiftProgress" style="width: 0%"></div>
-        </div>
-
-        <div class="time-display" id="currentTimeDisplay">Current Time: --</div>
-        <div class="time-display" id="outTimeDisplay">Allowed Logout Time: --</div>
-        <div class="countdown" id="countdown">Remaining Time: --</div>
-        
-        <div class="status waiting" id="status">
-            <i class="fas fa-hourglass-start me-2"></i>Status: Waiting...
-        </div>
-        
-        <div class="weather-info" id="weatherInfo">
-            <div><i class="fas fa-temperature-high weather-icon"></i> <span id="weatherText">Weather: --</span></div>
-        </div>
-       <a id="installLink" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    To install the app on your Android
-  </a>
-
-
     </div>
 
     <!-- Alarm sound -->
@@ -452,9 +361,8 @@
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
     </audio>
 
-
-  <!-- Modal -->
-     <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+    <!-- Install Modal -->
+ <div class="modal fade" id="installModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content text-dark">
         <div class="modal-header">
@@ -471,100 +379,18 @@
     </div>
   </div>
 
-    <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js")
-      .then(() => console.log("Service Worker registered"));
-  }
-</script>
+    
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bootstrap Modal Example</title>
-  <!-- Bootstrap CSS -->
-</head>
-<body class="p-5">
-
-  <!-- Button trigger modal -->
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Install App</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-
-        <div class="modal-body">
-          <p>You can add this app to your home screen for a better experience.</p>
-          <p><b>Steps:</b></p>
-          <ul>
-            <li>Tap on <b>Share</b> or <b>Menu</b> in your browser.</li>
-            <li>Select <b>Add to Home Screen</b>.</li>
-          </ul>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success">Got it</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-
- <script>
-    let deferredPrompt;
-    const installBtn = document.getElementById("installBtn");
-    const installLink = document.getElementById("installLink");
-
-    // Detect if app is already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isStandalone) {
-      installLink.style.display = "none"; // Hide install link
-    }
-
-    // Listen for beforeinstallprompt
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installLink.style.display = "block"; // Show only when installable
-    });
-
-    // Handle install button click
-    installBtn.addEventListener("click", async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === "accepted") {
-          console.log("App installed");
-          installLink.style.display = "none"; // Hide after install
-        }
-        deferredPrompt = null;
-      }
-    });
-  </script>
-
-
-
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         const fullDayMinutes = 8 * 60 + 45; // 525 minutes (8h 45m)
         const halfDayMinutes = 4 * 60 + 22; // 262 minutes (4h 22m)
         let interval;
         let shiftInterval;
         let weatherInterval;
-
+        
         // Check if current date is Aug 13, 14, or 15
         function isIndependencePeriod() {
             const today = new Date();
@@ -580,8 +406,6 @@
                 document.body.classList.add('independence-day');
                 // Change clock icon color to be visible on white background
                 document.querySelector('.fa-clock').style.color = '#000';
-                
-              
             }
         }
 
@@ -832,25 +656,34 @@
 
             document.getElementById("logoutBtn").disabled = true;
         }
+        
+        // PWA Installation Handling
+        let deferredPrompt;
+        const installBtn = document.getElementById("installBtn");
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                
+                // Close the modal
+                const installModal = bootstrap.Modal.getInstance(document.getElementById('installModal'));
+                installModal.hide();
+            } else {
+                alert("Your browser doesn't support app installation or the app is already installed.");
+            }
+        });
     </script>
-
-
-<script>
-    document.getElementById("gotItBtn").addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt(); // Show the install prompt
-
-    const choiceResult = await deferredPrompt.userChoice;
-    console.log("User choice:", choiceResult.outcome);
-
-    // Reset deferredPrompt so it can’t be used again
-    deferredPrompt = null;
-  } else {
-    alert("Install prompt not available yet.");
-  }
-});
-
-</script>
-
-    </body>
-    </html>
+</body>
+</html>
