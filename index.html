@@ -6,53 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Bootstrap & Icons -->
+        <link rel="manifest" href="manifest.json">
+        <meta name="theme-color" content="#000000">
+        <link rel="icon" href="icons/icon-192.png">
+        <link rel="apple-touch-icon" href="icons/icon-192.png">
+
         <link rel="icon" type="image/png" href="timer-icon.svg">  
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
         <style>
-
-            
-
-
-    /* Very small screens */
-    @media (max-width: 576px) {
-        .balloon {
-            width: 40px;
-            height: 55px;
-            font-size: 6px;
-        }
-        
-        /* Adjust positions to float above card content */
-        .balloon.left {
-            left: 3% !important;
-        }
-        .balloon.right {
-            right: 3% !important;
-        }
-        
-        /* More compact vertical spacing */
-        .balloon:nth-child(1).left {
-            top: 5% !important;
-        }
-        .balloon:nth-child(2).left {
-            top: 20% !important;
-        }
-        .balloon:nth-child(3).left {
-            top: 35% !important;
-        }
-        .balloon:nth-child(4).right {
-            top: 10% !important;
-        }
-        .balloon:nth-child(5).right {
-            top: 25% !important;
-        }
-        .balloon:nth-child(6).right {
-            top: 40% !important;
-        }
-    }
-            /* Default colors */
+      /* Default colors */
             :root {
                 --primary: #6a11cb;
                 --secondary: #2575fc;
@@ -407,96 +372,7 @@
                 to { transform: translate(-50%, -50%) rotate(360deg); }
             }
 
-            /* Balloon styles */
-            .balloon-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 0;
-            }
-            
-            .balloon {
-                position: absolute;
-                width: 80px;
-                height: 100px;
-                border-radius: 50%;
-                animation: balloon-float 8s ease-in-out infinite;
-                opacity: 0.8;
-                z-index: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 10px;
-                font-weight: bold;
-                text-align: center;
-                color: #000;
-                text-shadow: 0 0 2px rgba(255,255,255,0.5);
-                box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2);
-                transition: all 0.3s ease;
-            }
-            
-            .balloon::before {
-                content: '';
-                position: absolute;
-                bottom: -15px;
-                left: 50%;
-                width: 2px;
-                height: 60px;
-                background-color: rgba(0, 0, 0, 0.3);
-                transform: translateX(-50%);
-            }
-            
-            .balloon::after {
-                content: '';
-                position: absolute;
-                bottom: -25px;
-                left: 50%;
-                width: 8px;
-                height: 10px;
-                background-color: rgba(0, 0, 0, 0.3);
-                border-radius: 50%;
-                transform: translateX(-50%);
-            }
-            
-            .balloon.left {
-                left: 10%;
-            }
-            
-            .balloon.right {
-                right: 10%;
-            }
-            
-            .balloon-text {
-                position: relative;
-                z-index: 1;
-                padding: 0 5px;
-                word-break: break-word;
-                line-height: 1.2;
-            }
-            
-            @keyframes balloon-float {
-                0%, 100% {
-                    transform: translateY(0) rotate(0deg);
-                }
-                50% {
-                    transform: translateY(-100px) rotate(5deg);
-                }
-            }
-            
-            /* Balloon shine effect */
-            .balloon::after {
-                content: '';
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                width: 20px;
-                height: 20px;
-                background: rgba(255,255,255,0.3);
-                border-radius: 50%;
-            }
+           
         </style>
     </head>
     <body>
@@ -567,6 +443,14 @@
     </audio>
 
     <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("Service Worker registered"));
+  }
+</script>
+
+
+    <script>
         const fullDayMinutes = 8 * 60 + 45; // 525 minutes (8h 45m)
         const halfDayMinutes = 4 * 60 + 22; // 262 minutes (4h 22m)
         let interval;
@@ -589,13 +473,7 @@
                 // Change clock icon color to be visible on white background
                 document.querySelector('.fa-clock').style.color = '#000';
                 
-                // Make balloons more visible during independence day
-                const balloons = document.querySelectorAll('.balloon');
-                balloons.forEach(balloon => {
-                    balloon.style.opacity = '0.9';
-                    balloon.style.filter = 'drop-shadow(0 0 8px rgba(0,0,0,0.3))';
-                    balloon.style.boxShadow = 'inset -15px -15px 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2)';
-                });
+              
             }
         }
 
