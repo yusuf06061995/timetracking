@@ -1,6 +1,6 @@
 {
   "name": "Time Tracking App",
-  "short_name": "TimeTracker",
+  "short_name": "TimeTrack",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
