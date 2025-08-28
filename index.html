@@ -377,6 +377,9 @@
     </head>
     <body>
 
+    <button id="installBtn" style="display:none;">📲 Install App</button>
+    
+
     <!-- Celebration overlay (hidden by default) -->
     <div class="celebration" id="celebration">
         <div class="celebration-text">Shift Completed! 🎉</div>
@@ -448,6 +451,31 @@
       .then(() => console.log("Service Worker registered"));
   }
 </script>
+
+
+<script>
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn'); // button in HTML
+
+  // Listen for beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); // prevent auto prompt
+    deferredPrompt = e; // save event
+    installBtn.style.display = 'block'; // show button
+  });
+
+  // Handle button click
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt(); // show prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to install: ${outcome}`);
+      deferredPrompt = null; // reset
+      installBtn.style.display = 'none'; // hide button
+    }
+  });
+</script>
+
 
 
     <script>
